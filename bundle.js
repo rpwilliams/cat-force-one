@@ -7,10 +7,13 @@ const Vector = require('./vector');
 const Camera = require('./camera');
 const Player = require('./player');
 const BulletPool = require('./bullet_pool');
+const FlappyMonster = require('./flappy-monster')
 
 
 /* Global variables */
 var canvas = document.getElementById('screen');
+canvas.width = canvas.offsetWidth;
+canvas.height = canvas.offsetHeight;
 var game = new Game(canvas, update, render);
 var input = {
   up: false,
@@ -27,6 +30,7 @@ var backgrounds = [
   new Image(),
   new Image
 ];
+var flappyMonsters = [];
 // Public domain: http://opengameart.org/content/ruined-city-background
 backgrounds[0].src = 'assets/city-foreground.png';
 backgrounds[1].src = 'assets/city-background.png';
@@ -91,6 +95,13 @@ window.onkeyup = function(event) {
   }
 }
 
+function init()
+{
+  flappyMonsters.push(new FlappyMonster(0, 0));
+  flappyMonsters.push(new FlappyMonster(100, 400));
+}
+init();
+
 /**
  * @function masterLoop
  * Advances the game in sync with the refresh rate of the screen
@@ -101,6 +112,7 @@ var masterLoop = function(timestamp) {
   window.requestAnimationFrame(masterLoop);
 }
 masterLoop(performance.now());
+
 
 /**
  * @function update
@@ -123,6 +135,27 @@ function update(elapsedTime) {
     if(!camera.onScreen(bullet)) return true;
     return false;
   });
+
+  // Update the flappy monsters
+  flappyMonsters.forEach(function(monster){
+    monster.update(elapsedTime);
+  });
+
+  // Update the flappy monsters
+  flappyMonsters.forEach(function(monster){
+    if(checkCollision(player, monster))
+    {
+      console.log("Collision!");
+      console.log("Player: " + "(" + player.position.x + "," + player.position.y + ")");
+      console.log("Flappy monster: (" + monster.position.x
+        + "," + monster.position.y + ")");
+    }
+  });
+
+  //console.log("Player: " + "(" + player.position.x + "," + player.position.y + ")");
+
+  //console.log("Flappy monster: (" + flappyMonsters[1].position.x
+  //   + "," + flappyMonsters[1].position.y + ")");
 
   // Update missiles
   // var markedForRemoval = [];
@@ -151,98 +184,94 @@ function render(elapsedTime, ctx) {
   // TODO: Render background
   // Includes background repeats every 1000 pixels so the level lasts longer
   ctx.save();
-  ctx.translate(-camera.x, 0);
+  ctx.translate(-camera.position.x, 0);
   ctx.drawImage(backgrounds[2], 0, 0, canvas.width, canvas.height);
   ctx.restore();
 
   ctx.save();
-  ctx.translate(-camera.x, 0);
+  ctx.translate(-camera.position.x, 0);
   ctx.drawImage(backgrounds[1], 0, 0, canvas.width, canvas.height);
   ctx.restore();
 
   ctx.save();
-  ctx.translate(-camera.x, 0);
+  ctx.translate(-camera.position.x, 0);
   ctx.drawImage(backgrounds[0], 0, 0, canvas.width, canvas.height);
   ctx.restore();
 
   ctx.save();
-  ctx.translate(-camera.x, 0);
+  ctx.translate(-camera.position.x, 0);
   ctx.drawImage(backgrounds[2], 1000, 0, canvas.width, canvas.height);
   ctx.restore();
 
   ctx.save();
-  ctx.translate(-camera.x, 0);
+  ctx.translate(-camera.position.x, 0);
   ctx.drawImage(backgrounds[1], 1000, 0, canvas.width, canvas.height);
   ctx.restore();
 
   ctx.save();
-  ctx.translate(-camera.x, 0);
+  ctx.translate(-camera.position.x, 0);
   ctx.drawImage(backgrounds[0], 1000, 0, canvas.width, canvas.height);
   ctx.restore();
 
   ctx.save();
-  ctx.translate(-camera.x, 0);
+  ctx.translate(-camera.position.x, 0);
   ctx.drawImage(backgrounds[2], 2000, 0, canvas.width, canvas.height);
   ctx.restore();
 
   ctx.save();
-  ctx.translate(-camera.x, 0);
+  ctx.translate(-camera.position.x, 0);
   ctx.drawImage(backgrounds[1], 2000, 0, canvas.width, canvas.height);
   ctx.restore();
 
   ctx.save();
-  ctx.translate(-camera.x, 0);
+  ctx.translate(-camera.position.x, 0);
   ctx.drawImage(backgrounds[0], 2000, 0, canvas.width, canvas.height);
   ctx.restore();
 
   ctx.save();
-  ctx.translate(-camera.x, 0);
+  ctx.translate(-camera.position.x, 0);
   ctx.drawImage(backgrounds[2], 3000, 0, canvas.width, canvas.height);
   ctx.restore();
 
   ctx.save();
-  ctx.translate(-camera.x, 0);
+  ctx.translate(-camera.position.x, 0);
   ctx.drawImage(backgrounds[1], 3000, 0, canvas.width, canvas.height);
   ctx.restore();
 
   ctx.save();
-  ctx.translate(-camera.x, 0);
+  ctx.translate(-camera.position.x, 0);
   ctx.drawImage(backgrounds[0], 3000, 0, canvas.width, canvas.height);
   ctx.restore();
 
   ctx.save();
-  ctx.translate(-camera.x, 0);
+  ctx.translate(-camera.position.x, 0);
   ctx.drawImage(backgrounds[2], 4000, 0, canvas.width, canvas.height);
   ctx.restore();
 
   ctx.save();
-  ctx.translate(-camera.x, 0);
+  ctx.translate(-camera.position.x, 0);
   ctx.drawImage(backgrounds[1], 4000, 0, canvas.width, canvas.height);
   ctx.restore();
 
   ctx.save();
-  ctx.translate(-camera.x, 0);
+  ctx.translate(-camera.position.x, 0);
   ctx.drawImage(backgrounds[0], 4000, 0, canvas.width, canvas.height);
   ctx.restore();
 
   ctx.save();
-  ctx.translate(-camera.x, 0);
+  ctx.translate(-camera.position.x, 0);
   ctx.drawImage(backgrounds[2], 5000, 0, canvas.width, canvas.height);
   ctx.restore();
 
   ctx.save();
-  ctx.translate(-camera.x, 0);
+  ctx.translate(-camera.position.x, 0);
   ctx.drawImage(backgrounds[1], 5000, 0, canvas.width, canvas.height);
   ctx.restore();
 
   ctx.save();
-  ctx.translate(-camera.x, 0);
+  ctx.translate(-camera.position.x, 0);
   ctx.drawImage(backgrounds[0], 5000, 0, canvas.width, canvas.height);
   ctx.restore();
-
-
-
-
 
   // Transform the coordinate system using
   // the camera position BEFORE rendering
@@ -250,7 +279,7 @@ function render(elapsedTime, ctx) {
   // can be rendered in WORLD cooridnates
   // but appear in SCREEN coordinates
   ctx.save();
-  ctx.translate(-camera.x, -camera.y);
+  ctx.translate(-camera.position.x, -camera.position.y);
   renderWorld(elapsedTime, ctx, camera);
   ctx.restore();
 
@@ -277,6 +306,11 @@ function renderWorld(elapsedTime, ctx, camera) {
 
     // Render the player
     player.render(elapsedTime, ctx, camera);
+
+    // Render the flappy monsters
+    flappyMonsters.forEach(function(FlappyMonster){
+      FlappyMonster.render(elapsedTime, ctx);
+    });
 }
 
 /**
@@ -289,7 +323,21 @@ function renderGUI(elapsedTime, ctx) {
   // TODO: Render the GUI
 }
 
-},{"./bullet_pool":2,"./camera":3,"./game":4,"./player":5,"./vector":6}],2:[function(require,module,exports){
+/**
+  * @function checkCollisions
+  * Checks for a collision by drawing a box around the shape
+  * @param {a} the first object
+  * @param {b} the second object
+  * @return false if no collision, true if collision
+  */
+function checkCollision(a, b)
+{
+  return a.position.x < b.position.x + b.width &&
+    a.position.x + a.width > b.position.x &&
+    a.position.y < b.position.y + b.height &&
+    a.position.y + a.height > b.position.y;
+}
+},{"./bullet_pool":2,"./camera":3,"./flappy-monster":4,"./game":5,"./player":6,"./vector":7}],2:[function(require,module,exports){
 "use strict";
 
 /**
@@ -406,8 +454,7 @@ module.exports = exports = Camera;
  * @param {Rect} screen the bounds of the screen
  */
 function Camera(screen) {
-  this.x = 0;
-  this.y = 0;
+  this.position = {x:0, y:0};
   this.width = screen.width;
   this.height = screen.height;
   this.xMin = 100;
@@ -424,13 +471,13 @@ Camera.prototype.update = function(target) {
   // TODO: Align camera with player
   var self = this;
   self.xOff += target.velocity.x;
-  console.log(self.xOff, self.xMax, self.xOff > self.xMax);
+  //console.log(self.xOff, self.xMax, self.xOff > self.xMax);
   if(self.xOff > self.xMax) {
-    self.x += self.xOff - self.xMax;
+    self.position.x += self.xOff - self.xMax;
     self.xOff = self.xMax;
   }
   if(self.xOff < self.xMin) {
-    self.x -= self.xMin - self.xOff;
+    self.position.x -= self.xMin - self.xOff;
     self.xOff = self.xMin;
   }
 
@@ -472,7 +519,126 @@ Camera.prototype.toWorldCoordinates = function(screenCoordinates) {
   return Vector.add(screenCoordinates, this);
 }
 
-},{"./vector":6}],4:[function(require,module,exports){
+},{"./vector":7}],4:[function(require,module,exports){
+"use strict";
+
+/* Classes and Libraries */
+const Vector = require('./vector');
+//const Missile = require('./missile');
+
+/* Constants */
+const PLAYER_SPEED = 1;
+const MS_PER_FRAME = 1000/8;
+
+/**
+ * @module FlappyMonster
+ * A class representing a player's helicopter
+ */
+module.exports = exports = FlappyMonster;
+
+/**
+ * @constructor Flappy Monster
+ * Creates a flappy monster
+ * @param {xPos} the x position
+ * @param {yPos} the y position
+ */
+function FlappyMonster(xPos, yPos) {
+  this.angle = 0;
+  this.position = {x: xPos, y: yPos};
+  this.velocity = {x: 0, y: 0};
+  this.img = new Image();
+  this.frame = "frame-1";
+  this.img.src = 'assets/enemies/flappy-monster/frame-1.png';
+  this.timer = 0;
+  this.height = 64;
+  this.width = 64;
+
+  var self = this;
+  self.animate = function(time)
+  {
+    self.timer += time;
+    if(self.timer > MS_PER_FRAME)
+    {
+      self.timer = 0;
+      switch(self.frame)
+      {
+        case 'frame-1':
+          self.frame = 'frame-2';
+          self.img.src = 'assets/enemies/flappy-monster/frame-2.png';
+          break;
+        case 'frame-2':
+          self.frame = 'frame-3';
+          self.img.src = 'assets/enemies/flappy-monster/frame-3.png';
+          break;
+        case 'frame-3':
+          self.frame = 'frame-4';
+          self.img.src = 'assets/enemies/flappy-monster/frame-4.png';
+          break;
+        case 'frame-4':
+          self.frame = 'frame-5';
+          self.img.src = 'assets/enemies/flappy-monster/frame-5.png';
+          break;
+        case 'frame-5':
+          self.frame = 'frame-6';
+          self.img.src = 'assets/enemies/flappy-monster/frame-6.png';
+          break;
+        case 'frame-6':
+          self.frame = 'frame-7';
+          self.img.src = 'assets/enemies/flappy-monster/frame-7.png';
+          break;
+        case 'frame-7':
+          self.frame = 'frame-8';
+          self.img.src = 'assets/enemies/flappy-monster/frame-8.png';
+          break;
+        case 'frame-8':
+          self.frame = 'frame-1';
+          self.img.src = 'assets/enemies/flappy-monster/frame-1.png';
+          break;
+      }
+    }
+  }
+}
+
+/**
+ * @function update
+ * Updates the flappy monster based on the supplied input
+ * @param {DOMHighResTimeStamp} elapedTime
+ */
+FlappyMonster.prototype.update = function(elapsedTime) {
+  // move the player
+  this.velocity.x += PLAYER_SPEED;
+  this.position.x += PLAYER_SPEED;
+
+  // don't let the player move off-screen
+  //if(this.position.x < 0) this.position.x = 0;
+  //if(this.position.x > 1024) this.position.x = 1024;
+  //if(this.position.y > 786) this.position.y = 786;
+
+  // animate the monster
+  this.animate(elapsedTime);
+}
+
+/**
+ * @function render
+ * Renders the flappy monster in world coordinates
+ * @param {DOMHighResTimeStamp} elapsedTime
+ * @param {CanvasRenderingContext2D} ctx
+ */
+FlappyMonster.prototype.render = function(elapsedTime, ctx) {
+  //var offset = this.angle * 23;
+  //console.log(this.position.x);
+  ctx.save();
+  ctx.translate(this.position.x, this.position.y);
+  ctx.drawImage(this.img, 0, 0, this.width, this.height);
+  ctx.restore();
+}
+
+
+  
+
+
+
+},{"./vector":7}],5:[function(require,module,exports){
 "use strict";
 
 /**
@@ -530,7 +696,7 @@ Game.prototype.loop = function(newTime) {
   this.frontCtx.drawImage(this.backBuffer, 0, 0);
 }
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 "use strict";
 
 /* Classes and Libraries */
@@ -538,7 +704,7 @@ const Vector = require('./vector');
 //const Missile = require('./missile');
 
 /* Constants */
-const PLAYER_SPEED = 4;
+const PLAYER_SPEED = 5;
 const BULLET_SPEED = 10;
 
 /**
@@ -561,6 +727,8 @@ function Player(bullets, missiles) {
   this.velocity = {x: 0, y: 0};
   this.img = new Image()
   this.img.src = 'assets/tyrian.shp.007D3C.png';
+  this.width = 23;
+  this.height = 27;
 }
 
 /**
@@ -590,9 +758,9 @@ Player.prototype.update = function(elapsedTime, input) {
   this.position.y += this.velocity.y;
 
   // don't let the player move off-screen
-  if(this.position.x < 0) this.position.x = 0;
+  if(this.position.x < 0) this.position.x = 200;
   //if(this.position.x > 1024) this.position.x = 1024;
-  if(this.position.y > 786) this.position.y = 786;
+  //if(this.position.y > 786) this.position.y = 786;
 
 }
 
@@ -604,7 +772,6 @@ Player.prototype.update = function(elapsedTime, input) {
  */
 Player.prototype.render = function(elapasedTime, ctx, camera) {
   var offset = this.angle * 23;
-  console.log(this.position.x);
   ctx.save();
   ctx.translate(this.position.x, this.position.y);
   ctx.drawImage(this.img, 48+offset, 57, 23, 27, -12.5, -12, 23, 27);
@@ -636,7 +803,7 @@ Player.prototype.fireMissile = function() {
   }
 }
 
-},{"./vector":6}],6:[function(require,module,exports){
+},{"./vector":7}],7:[function(require,module,exports){
 "use strict";
 
 /**

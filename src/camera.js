@@ -15,8 +15,7 @@ module.exports = exports = Camera;
  * @param {Rect} screen the bounds of the screen
  */
 function Camera(screen) {
-  this.x = 0;
-  this.y = 0;
+  this.position = {x:0, y:0};
   this.width = screen.width;
   this.height = screen.height;
   this.xMin = 100;
@@ -33,13 +32,13 @@ Camera.prototype.update = function(target) {
   // TODO: Align camera with player
   var self = this;
   self.xOff += target.velocity.x;
-  console.log(self.xOff, self.xMax, self.xOff > self.xMax);
+  //console.log(self.xOff, self.xMax, self.xOff > self.xMax);
   if(self.xOff > self.xMax) {
-    self.x += self.xOff - self.xMax;
+    self.position.x += self.xOff - self.xMax;
     self.xOff = self.xMax;
   }
   if(self.xOff < self.xMin) {
-    self.x -= self.xMin - self.xOff;
+    self.position.x -= self.xMin - self.xOff;
     self.xOff = self.xMin;
   }
 

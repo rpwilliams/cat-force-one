@@ -6,10 +6,13 @@ const Vector = require('./vector');
 const Camera = require('./camera');
 const Player = require('./player');
 const BulletPool = require('./bullet_pool');
+const FlappyMonster = require('./flappy-monster')
 
 
 /* Global variables */
 var canvas = document.getElementById('screen');
+canvas.width = canvas.offsetWidth;
+canvas.height = canvas.offsetHeight;
 var game = new Game(canvas, update, render);
 var input = {
   up: false,
@@ -26,6 +29,7 @@ var backgrounds = [
   new Image(),
   new Image
 ];
+var flappyMonsters = [];
 // Public domain: http://opengameart.org/content/ruined-city-background
 backgrounds[0].src = 'assets/city-foreground.png';
 backgrounds[1].src = 'assets/city-background.png';
@@ -90,6 +94,13 @@ window.onkeyup = function(event) {
   }
 }
 
+function init()
+{
+  flappyMonsters.push(new FlappyMonster(0, 0));
+  flappyMonsters.push(new FlappyMonster(100, 400));
+}
+init();
+
 /**
  * @function masterLoop
  * Advances the game in sync with the refresh rate of the screen
@@ -100,6 +111,7 @@ var masterLoop = function(timestamp) {
   window.requestAnimationFrame(masterLoop);
 }
 masterLoop(performance.now());
+
 
 /**
  * @function update
@@ -122,6 +134,27 @@ function update(elapsedTime) {
     if(!camera.onScreen(bullet)) return true;
     return false;
   });
+
+  // Update the flappy monsters
+  flappyMonsters.forEach(function(monster){
+    monster.update(elapsedTime);
+  });
+
+  // Update the flappy monsters
+  flappyMonsters.forEach(function(monster){
+    if(checkCollision(player, monster))
+    {
+      console.log("Collision!");
+      console.log("Player: " + "(" + player.position.x + "," + player.position.y + ")");
+      console.log("Flappy monster: (" + monster.position.x
+        + "," + monster.position.y + ")");
+    }
+  });
+
+  //console.log("Player: " + "(" + player.position.x + "," + player.position.y + ")");
+
+  //console.log("Flappy monster: (" + flappyMonsters[1].position.x
+  //   + "," + flappyMonsters[1].position.y + ")");
 
   // Update missiles
   // var markedForRemoval = [];
@@ -150,98 +183,94 @@ function render(elapsedTime, ctx) {
   // TODO: Render background
   // Includes background repeats every 1000 pixels so the level lasts longer
   ctx.save();
-  ctx.translate(-camera.x, 0);
+  ctx.translate(-camera.position.x, 0);
   ctx.drawImage(backgrounds[2], 0, 0, canvas.width, canvas.height);
   ctx.restore();
 
   ctx.save();
-  ctx.translate(-camera.x, 0);
+  ctx.translate(-camera.position.x, 0);
   ctx.drawImage(backgrounds[1], 0, 0, canvas.width, canvas.height);
   ctx.restore();
 
   ctx.save();
-  ctx.translate(-camera.x, 0);
+  ctx.translate(-camera.position.x, 0);
   ctx.drawImage(backgrounds[0], 0, 0, canvas.width, canvas.height);
   ctx.restore();
 
   ctx.save();
-  ctx.translate(-camera.x, 0);
+  ctx.translate(-camera.position.x, 0);
   ctx.drawImage(backgrounds[2], 1000, 0, canvas.width, canvas.height);
   ctx.restore();
 
   ctx.save();
-  ctx.translate(-camera.x, 0);
+  ctx.translate(-camera.position.x, 0);
   ctx.drawImage(backgrounds[1], 1000, 0, canvas.width, canvas.height);
   ctx.restore();
 
   ctx.save();
-  ctx.translate(-camera.x, 0);
+  ctx.translate(-camera.position.x, 0);
   ctx.drawImage(backgrounds[0], 1000, 0, canvas.width, canvas.height);
   ctx.restore();
 
   ctx.save();
-  ctx.translate(-camera.x, 0);
+  ctx.translate(-camera.position.x, 0);
   ctx.drawImage(backgrounds[2], 2000, 0, canvas.width, canvas.height);
   ctx.restore();
 
   ctx.save();
-  ctx.translate(-camera.x, 0);
+  ctx.translate(-camera.position.x, 0);
   ctx.drawImage(backgrounds[1], 2000, 0, canvas.width, canvas.height);
   ctx.restore();
 
   ctx.save();
-  ctx.translate(-camera.x, 0);
+  ctx.translate(-camera.position.x, 0);
   ctx.drawImage(backgrounds[0], 2000, 0, canvas.width, canvas.height);
   ctx.restore();
 
   ctx.save();
-  ctx.translate(-camera.x, 0);
+  ctx.translate(-camera.position.x, 0);
   ctx.drawImage(backgrounds[2], 3000, 0, canvas.width, canvas.height);
   ctx.restore();
 
   ctx.save();
-  ctx.translate(-camera.x, 0);
+  ctx.translate(-camera.position.x, 0);
   ctx.drawImage(backgrounds[1], 3000, 0, canvas.width, canvas.height);
   ctx.restore();
 
   ctx.save();
-  ctx.translate(-camera.x, 0);
+  ctx.translate(-camera.position.x, 0);
   ctx.drawImage(backgrounds[0], 3000, 0, canvas.width, canvas.height);
   ctx.restore();
 
   ctx.save();
-  ctx.translate(-camera.x, 0);
+  ctx.translate(-camera.position.x, 0);
   ctx.drawImage(backgrounds[2], 4000, 0, canvas.width, canvas.height);
   ctx.restore();
 
   ctx.save();
-  ctx.translate(-camera.x, 0);
+  ctx.translate(-camera.position.x, 0);
   ctx.drawImage(backgrounds[1], 4000, 0, canvas.width, canvas.height);
   ctx.restore();
 
   ctx.save();
-  ctx.translate(-camera.x, 0);
+  ctx.translate(-camera.position.x, 0);
   ctx.drawImage(backgrounds[0], 4000, 0, canvas.width, canvas.height);
   ctx.restore();
 
   ctx.save();
-  ctx.translate(-camera.x, 0);
+  ctx.translate(-camera.position.x, 0);
   ctx.drawImage(backgrounds[2], 5000, 0, canvas.width, canvas.height);
   ctx.restore();
 
   ctx.save();
-  ctx.translate(-camera.x, 0);
+  ctx.translate(-camera.position.x, 0);
   ctx.drawImage(backgrounds[1], 5000, 0, canvas.width, canvas.height);
   ctx.restore();
 
   ctx.save();
-  ctx.translate(-camera.x, 0);
+  ctx.translate(-camera.position.x, 0);
   ctx.drawImage(backgrounds[0], 5000, 0, canvas.width, canvas.height);
   ctx.restore();
-
-
-
-
 
   // Transform the coordinate system using
   // the camera position BEFORE rendering
@@ -249,7 +278,7 @@ function render(elapsedTime, ctx) {
   // can be rendered in WORLD cooridnates
   // but appear in SCREEN coordinates
   ctx.save();
-  ctx.translate(-camera.x, -camera.y);
+  ctx.translate(-camera.position.x, -camera.position.y);
   renderWorld(elapsedTime, ctx, camera);
   ctx.restore();
 
@@ -276,6 +305,11 @@ function renderWorld(elapsedTime, ctx, camera) {
 
     // Render the player
     player.render(elapsedTime, ctx, camera);
+
+    // Render the flappy monsters
+    flappyMonsters.forEach(function(FlappyMonster){
+      FlappyMonster.render(elapsedTime, ctx);
+    });
 }
 
 /**
@@ -286,4 +320,19 @@ function renderWorld(elapsedTime, ctx, camera) {
   */
 function renderGUI(elapsedTime, ctx) {
   // TODO: Render the GUI
+}
+
+/**
+  * @function checkCollisions
+  * Checks for a collision by drawing a box around the shape
+  * @param {a} the first object
+  * @param {b} the second object
+  * @return false if no collision, true if collision
+  */
+function checkCollision(a, b)
+{
+  return a.position.x < b.position.x + b.width &&
+    a.position.x + a.width > b.position.x &&
+    a.position.y < b.position.y + b.height &&
+    a.position.y + a.height > b.position.y;
 }
