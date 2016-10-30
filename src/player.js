@@ -2,10 +2,10 @@
 
 /* Classes and Libraries */
 const Vector = require('./vector');
-const Missile = require('./missile');
+//const Missile = require('./missile');
 
 /* Constants */
-const PLAYER_SPEED = 5;
+const PLAYER_SPEED = 4;
 const BULLET_SPEED = 10;
 
 /**
@@ -58,8 +58,9 @@ Player.prototype.update = function(elapsedTime, input) {
 
   // don't let the player move off-screen
   if(this.position.x < 0) this.position.x = 0;
-  if(this.position.x > 1024) this.position.x = 1024;
+  //if(this.position.x > 1024) this.position.x = 1024;
   if(this.position.y > 786) this.position.y = 786;
+
 }
 
 /**
@@ -68,8 +69,9 @@ Player.prototype.update = function(elapsedTime, input) {
  * @param {DOMHighResTimeStamp} elapsedTime
  * @param {CanvasRenderingContext2D} ctx
  */
-Player.prototype.render = function(elapasedTime, ctx) {
+Player.prototype.render = function(elapasedTime, ctx, camera) {
   var offset = this.angle * 23;
+  console.log(this.position.x);
   ctx.save();
   ctx.translate(this.position.x, this.position.y);
   ctx.drawImage(this.img, 48+offset, 57, 23, 27, -12.5, -12, 23, 27);

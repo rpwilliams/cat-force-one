@@ -21,6 +21,16 @@ var camera = new Camera(canvas);
 var bullets = new BulletPool(10);
 var missiles = [];
 var player = new Player(bullets, missiles);
+var backgrounds = [
+  new Image(),
+  new Image(),
+  new Image
+];
+// Public domain: http://opengameart.org/content/ruined-city-background
+backgrounds[0].src = 'assets/city-foreground.png';
+backgrounds[1].src = 'assets/city-background.png';
+backgrounds[2].src = 'assets/city-sky.png';
+
 
 /**
  * @function onkeydown
@@ -105,7 +115,7 @@ function update(elapsedTime) {
   player.update(elapsedTime, input);
 
   // update the camera
-  camera.update(player.position);
+  camera.update(player);
 
   // Update bullets
   bullets.update(elapsedTime, function(bullet){
@@ -114,16 +124,16 @@ function update(elapsedTime) {
   });
 
   // Update missiles
-  var markedForRemoval = [];
-  missiles.forEach(function(missile, i){
-    missile.update(elapsedTime);
-    if(Math.abs(missile.position.x - camera.x) > camera.width * 2)
-      markedForRemoval.unshift(i);
-  });
-  // Remove missiles that have gone off-screen
-  markedForRemoval.forEach(function(index){
-    missiles.splice(index, 1);
-  });
+  // var markedForRemoval = [];
+  // missiles.forEach(function(missile, i){
+  //   missile.update(elapsedTime);
+  //   if(Math.abs(missile.position.x - camera.x) > camera.width * 2)
+  //     markedForRemoval.unshift(i);
+  // });
+  // // Remove missiles that have gone off-screen
+  // markedForRemoval.forEach(function(index){
+  //   missiles.splice(index, 1);
+  // });
 }
 
 /**
@@ -134,10 +144,104 @@ function update(elapsedTime) {
   * @param {CanvasRenderingContext2D} ctx the context to render to
   */
 function render(elapsedTime, ctx) {
-  ctx.fillStyle = "black";
-  ctx.fillRect(0, 0, 1024, 786);
+  //ctx.fillStyle = "black";
+  //ctx.fillRect(0, 0, 1024, 786);
 
   // TODO: Render background
+  // Includes background repeats every 1000 pixels so the level lasts longer
+  ctx.save();
+  ctx.translate(-camera.x, 0);
+  ctx.drawImage(backgrounds[2], 0, 0, canvas.width, canvas.height);
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(-camera.x, 0);
+  ctx.drawImage(backgrounds[1], 0, 0, canvas.width, canvas.height);
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(-camera.x, 0);
+  ctx.drawImage(backgrounds[0], 0, 0, canvas.width, canvas.height);
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(-camera.x, 0);
+  ctx.drawImage(backgrounds[2], 1000, 0, canvas.width, canvas.height);
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(-camera.x, 0);
+  ctx.drawImage(backgrounds[1], 1000, 0, canvas.width, canvas.height);
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(-camera.x, 0);
+  ctx.drawImage(backgrounds[0], 1000, 0, canvas.width, canvas.height);
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(-camera.x, 0);
+  ctx.drawImage(backgrounds[2], 2000, 0, canvas.width, canvas.height);
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(-camera.x, 0);
+  ctx.drawImage(backgrounds[1], 2000, 0, canvas.width, canvas.height);
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(-camera.x, 0);
+  ctx.drawImage(backgrounds[0], 2000, 0, canvas.width, canvas.height);
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(-camera.x, 0);
+  ctx.drawImage(backgrounds[2], 3000, 0, canvas.width, canvas.height);
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(-camera.x, 0);
+  ctx.drawImage(backgrounds[1], 3000, 0, canvas.width, canvas.height);
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(-camera.x, 0);
+  ctx.drawImage(backgrounds[0], 3000, 0, canvas.width, canvas.height);
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(-camera.x, 0);
+  ctx.drawImage(backgrounds[2], 4000, 0, canvas.width, canvas.height);
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(-camera.x, 0);
+  ctx.drawImage(backgrounds[1], 4000, 0, canvas.width, canvas.height);
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(-camera.x, 0);
+  ctx.drawImage(backgrounds[0], 4000, 0, canvas.width, canvas.height);
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(-camera.x, 0);
+  ctx.drawImage(backgrounds[2], 5000, 0, canvas.width, canvas.height);
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(-camera.x, 0);
+  ctx.drawImage(backgrounds[1], 5000, 0, canvas.width, canvas.height);
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(-camera.x, 0);
+  ctx.drawImage(backgrounds[0], 5000, 0, canvas.width, canvas.height);
+  ctx.restore();
+
+
+
+
 
   // Transform the coordinate system using
   // the camera position BEFORE rendering
@@ -146,7 +250,7 @@ function render(elapsedTime, ctx) {
   // but appear in SCREEN coordinates
   ctx.save();
   ctx.translate(-camera.x, -camera.y);
-  renderWorld(elapsedTime, ctx);
+  renderWorld(elapsedTime, ctx, camera);
   ctx.restore();
 
   // Render the GUI without transforming the
@@ -161,17 +265,17 @@ function render(elapsedTime, ctx) {
   * @param {DOMHighResTimeStamp} elapsedTime
   * @param {CanvasRenderingContext2D} ctx the context to render to
   */
-function renderWorld(elapsedTime, ctx) {
+function renderWorld(elapsedTime, ctx, camera) {
     // Render the bullets
     bullets.render(elapsedTime, ctx);
 
     // Render the missiles
-    missiles.forEach(function(missile) {
-      missile.render(elapsedTime, ctx);
-    });
+    //missiles.forEach(function(missile) {
+    //  missile.render(elapsedTime, ctx);
+    //});
 
     // Render the player
-    player.render(elapsedTime, ctx);
+    player.render(elapsedTime, ctx, camera);
 }
 
 /**

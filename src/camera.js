@@ -19,6 +19,9 @@ function Camera(screen) {
   this.y = 0;
   this.width = screen.width;
   this.height = screen.height;
+  this.xMin = 100;
+  this.xMax = 1000;
+  this.xOff = 500;
 }
 
 /**
@@ -28,6 +31,19 @@ function Camera(screen) {
  */
 Camera.prototype.update = function(target) {
   // TODO: Align camera with player
+  var self = this;
+  self.xOff += target.velocity.x;
+  console.log(self.xOff, self.xMax, self.xOff > self.xMax);
+  if(self.xOff > self.xMax) {
+    self.x += self.xOff - self.xMax;
+    self.xOff = self.xMax;
+  }
+  if(self.xOff < self.xMin) {
+    self.x -= self.xMin - self.xOff;
+    self.xOff = self.xMin;
+  }
+
+  if(self.x < 0) self.x = 0;
 }
 
 /**
