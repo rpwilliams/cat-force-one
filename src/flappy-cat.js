@@ -20,7 +20,9 @@ module.exports = exports = FlappyCat;
  * @param {xPos} the x position
  * @param {yPos} the y position
  */
-function FlappyCat(xPos, yPos) {
+function FlappyCat(xPos, yPos, canvas) {
+  this.worldWidth = canvas.width;
+  this.worldHeight = canvas.height;
   this.angle = 0;
   this.position = {x: xPos, y: yPos};
   this.velocity = {x: 0, y: 0};
@@ -32,6 +34,7 @@ function FlappyCat(xPos, yPos) {
   this.state = "flying";
   this.height = 64;
   this.width = 64;
+  this.initialAcceleration = true; 
 
   var self = this;
   self.animate = function(time)
@@ -104,7 +107,7 @@ function FlappyCat(xPos, yPos) {
  */
 FlappyCat.prototype.update = function(elapsedTime) {
   // move the player
-  this.velocity.x += PLAYER_SPEED;
+  //this.velocity.x += PLAYER_SPEED;
   this.position.x += PLAYER_SPEED;
 
   // don't let the player move off-screen
@@ -114,6 +117,28 @@ FlappyCat.prototype.update = function(elapsedTime) {
 
   // animate the monster
   this.animate(elapsedTime);
+
+  // Apply angular velocity
+  this.angle += elapsedTime * 0.005;
+
+  // Apply acceleration
+  if(this.initialAcceleration) {
+    var acceleration = {
+      x: Math.sin(this.angle),
+      y: Math.cos(this.angle)
+    }
+    this.velocity.x -= acceleration.x;
+    this.velocity.y -= acceleration.y;
+    this.initialAcceleration = false;
+  }
+  // Apply velocity
+  this.position.x += this.velocity.x;
+  this.position.y += this.velocity.y;
+  // Wrap around the screen
+  //if(this.position.x < 0) this.position.x += this.worldWidth;
+  //if(this.position.x > this.worldWidth) this.position.x -= this.worldWidth;
+  if(this.position.y < 0) this.position.y += this.worldHeight;
+  if(this.position.y > this.worldHeight) this.position.y -= this.worldHeight;
 }
 
 /**
@@ -125,6 +150,7 @@ FlappyCat.prototype.update = function(elapsedTime) {
 FlappyCat.prototype.render = function(elapsedTime, ctx) {
   ctx.save();
   ctx.translate(this.position.x, this.position.y);
+  //ctx.rotate(-this.angle);
   ctx.drawImage(this.img, 0, 0, this.width, this.height);
   ctx.restore();
 }

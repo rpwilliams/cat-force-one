@@ -8,6 +8,7 @@ const Player = require('./player');
 const BulletPool = require('./bullet_pool');
 const FlappyMonster = require('./flappy-monster');
 const FlappyCat = require('./flappy-cat');
+const FlappyDragon = require('./flappy-dragon');
 
 /* Global variables */
 var canvas = document.getElementById('screen');
@@ -31,6 +32,7 @@ var backgrounds = [
 ];
 var flappyMonsters = [];
 var flappyCats = [];
+var flappyDragons = [];
 
 // http://opengameart.org/content/ruined-city-background (public domain)
 backgrounds[0].src = 'assets/city-foreground.png';
@@ -99,8 +101,35 @@ window.onkeyup = function(event) {
 function init()
 {
   flappyMonsters.push(new FlappyMonster(0, 0));
-  flappyMonsters.push(new FlappyMonster(100, 400));
-  flappyCats.push(new FlappyCat(50, 70));
+  flappyMonsters.push(new FlappyMonster(500, 20));
+  flappyMonsters.push(new FlappyMonster(1000, 80));
+  flappyMonsters.push(new FlappyMonster(1500, 400));
+  flappyMonsters.push(new FlappyMonster(2000, 225));
+  flappyMonsters.push(new FlappyMonster(3000, 225));
+  flappyCats.push(new FlappyCat(50, 70, canvas));
+  flappyCats.push(new FlappyCat(1000, 200, canvas));
+  flappyCats.push(new FlappyCat(2000, 10, canvas));
+  flappyCats.push(new FlappyCat(500, 70, canvas));
+  flappyCats.push(new FlappyCat(4000, 10, canvas));
+  flappyCats.push(new FlappyCat(5000, 10, canvas));
+  flappyDragons.push(new FlappyDragon(5000, 50));
+  flappyDragons.push(new FlappyDragon(4500, 100));
+  flappyDragons.push(new FlappyDragon(4000, 60));
+  flappyDragons.push(new FlappyDragon(3500, 500));
+  flappyDragons.push(new FlappyDragon(5000, 700));
+  flappyDragons.push(new FlappyDragon(4000, 10));
+  flappyDragons.push(new FlappyDragon(5000, 200));
+  flappyDragons.push(new FlappyDragon(10000, 50));
+  flappyDragons.push(new FlappyDragon(9000, 100));
+  flappyDragons.push(new FlappyDragon(8000, 60));
+  flappyDragons.push(new FlappyDragon(7000, 500));
+  flappyDragons.push(new FlappyDragon(6000, 700));
+  flappyDragons.push(new FlappyDragon(10000, 10));
+  flappyDragons.push(new FlappyDragon(10000, 200));
+  flappyDragons.push(new FlappyDragon(11000, 10));
+  flappyDragons.push(new FlappyDragon(11000, 200));
+  flappyDragons.push(new FlappyDragon(12000, 10));
+  flappyDragons.push(new FlappyDragon(12000, 200));
 }
 init();
 
@@ -152,13 +181,22 @@ function update(elapsedTime) {
 
   // Update the flappy cats
   flappyCats.forEach(function(cat){
-    cat.update(elapsedTime, false);
+    cat.update(elapsedTime);
     if(checkCollision(player, cat))
     {
       cat.state = "hit";
       cat.frame = "frame-1";
       cat.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
       console.log("Cat collision!");
+    }
+  });
+
+  // Update the flappy dragons
+  flappyDragons.forEach(function(dragon){
+    dragon.update(elapsedTime);
+    if(checkCollision(player, dragon))
+    {
+      console.log("Dragon collision! ROAR");
     }
   });
 
@@ -325,6 +363,11 @@ function renderWorld(elapsedTime, ctx, camera) {
     // Render the flappy cats
     flappyCats.forEach(function(FlappyCat){
       FlappyCat.render(elapsedTime, ctx);
+    });
+
+    // Render the flappy cats
+    flappyDragons.forEach(function(FlappyDragon){
+      FlappyDragon.render(elapsedTime, ctx);
     });
 }
 
