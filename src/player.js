@@ -7,6 +7,7 @@ const Vector = require('./vector');
 /* Constants */
 const PLAYER_SPEED = 5;
 const BULLET_SPEED = 10;
+const MS_PER_FRAME = 1000/8;
 
 /**
  * @module Player
@@ -27,9 +28,74 @@ function Player(bullets, missiles) {
   this.position = {x: 200, y: 200};
   this.velocity = {x: 0, y: 0};
   this.img = new Image()
-  this.img.src = 'assets/tyrian.shp.007D3C.png';
-  this.width = 23;
-  this.height = 27;
+  //this.img.src = 'assets/player/flappy-cat/flying/frame-1.png';
+  this.width = 64;
+  this.height = 64;
+  this.state = "flying";
+  this.timer = 0;
+  this.frame = 'frame-1';
+
+  var self = this;
+  self.animate = function(time)
+  {
+    self.timer += time;
+    if(self.timer > MS_PER_FRAME)
+    {
+      self.timer = 0;
+      if(self.state = "flying")
+      {
+        switch(self.frame)
+        {
+          case 'frame-1':
+            self.frame = 'frame-2';
+            self.img.src = 'assets/enemies/flappy-cat/flying/frame-1.png';
+            break;
+          case 'frame-2':
+            self.frame = 'frame-3';
+            self.img.src = 'assets/enemies/flappy-cat/flying/frame-2.png';
+            break;
+          case 'frame-3':
+            self.frame = 'frame-4';
+            self.img.src = 'assets/enemies/flappy-cat/flying/frame-3.png';
+            break;
+          case 'frame-4':
+            self.frame = 'frame-5';
+            self.img.src = 'assets/enemies/flappy-cat/flying/frame-4.png';
+            break;
+          case 'frame-5':
+            self.frame = 'frame-6';
+            self.img.src = 'assets/enemies/flappy-cat/flying/frame-5.png';
+            break;
+          case 'frame-6':
+            self.frame = 'frame-7';
+            self.img.src = 'assets/enemies/flappy-cat/flying/frame-6.png';
+            break;
+          case 'frame-7':
+            self.frame = 'frame-8';
+            self.img.src = 'assets/enemies/flappy-cat/flying/frame-7.png';
+            break;
+          case 'frame-8':
+            self.frame = 'frame-1';
+            self.img.src = 'assets/enemies/flappy-cat/flying/frame-8.png';
+            break;
+        }
+      }
+      else
+      {
+        switch(self.frame)
+        {
+          case 'frame-1':
+            self.frame = 'frame-2';
+            self.img.src = 'assets/enemies/flappy-cat/hit/frame-2.png';
+            break;
+          case 'frame-2':
+            self.frame = 'frame-1';
+            self.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
+            break;
+        }
+      }
+    }
+  }  
 }
 
 /**
@@ -40,6 +106,8 @@ function Player(bullets, missiles) {
  * boolean properties: up, left, right, down
  */
 Player.prototype.update = function(elapsedTime, input) {
+
+  this.animate(elapsedTime);
 
   // set the velocity
   this.velocity.x = 0;
@@ -61,8 +129,7 @@ Player.prototype.update = function(elapsedTime, input) {
   // don't let the player move off-screen
   if(this.position.x < 0) this.position.x = 200;
   //if(this.position.x > 1024) this.position.x = 1024;
-  //if(this.position.y > 786) this.position.y = 786;
-
+  //if(this.position.y > 786) this.position.y = 786;  
 }
 
 /**
@@ -72,10 +139,11 @@ Player.prototype.update = function(elapsedTime, input) {
  * @param {CanvasRenderingContext2D} ctx
  */
 Player.prototype.render = function(elapasedTime, ctx, camera) {
-  var offset = this.angle * 23;
+  //var offset = this.angle * 23;
   ctx.save();
   ctx.translate(this.position.x, this.position.y);
-  ctx.drawImage(this.img, 48+offset, 57, 23, 27, -12.5, -12, 23, 27);
+  //ctx.drawImage(this.img, 48+offset, 57, 23, 27, -12.5, -12, 23, 27);
+  ctx.drawImage(this.img, 0, 0, this.width, this.height);
   ctx.restore();
 }
 

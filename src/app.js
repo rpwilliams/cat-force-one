@@ -7,9 +7,10 @@ const Camera = require('./camera');
 const Player = require('./player');
 const BulletPool = require('./bullet_pool');
 const FlappyMonster = require('./flappy-monster');
-const FlappyCat = require('./flappy-cat');
+const Skull = require('./skull');
 const FlappyDragon = require('./flappy-dragon');
-const FlappyGrumpy = require('./flappy-grumpy')
+const FlappyGrumpy = require('./flappy-grumpy');
+const FlappyBird = require('./flappy-bird');
 
 /* Global variables */
 var canvas = document.getElementById('screen');
@@ -32,9 +33,10 @@ var backgrounds = [
   new Image
 ];
 var flappyMonsters = [];
-var flappyCats = [];
+var skulls = [];
 var flappyDragons = [];
 var flappyGrumpys = [];
+var flappyBirds = [];
 
 // http://opengameart.org/content/ruined-city-background (public domain)
 backgrounds[0].src = 'assets/city-foreground.png';
@@ -109,12 +111,12 @@ function init()
   flappyMonsters.push(new FlappyMonster(2000, 225));
   flappyMonsters.push(new FlappyMonster(3000, 225));
 
-  flappyCats.push(new FlappyCat(50, 70, canvas));
-  flappyCats.push(new FlappyCat(1000, 200, canvas));
-  flappyCats.push(new FlappyCat(2000, 10, canvas));
-  flappyCats.push(new FlappyCat(500, 70, canvas));
-  flappyCats.push(new FlappyCat(4000, 10, canvas));
-  flappyCats.push(new FlappyCat(5000, 10, canvas));
+  skulls.push(new Skull(50, 70, canvas));
+  skulls.push(new Skull(1000, 200, canvas));
+  skulls.push(new Skull(2000, 10, canvas));
+  skulls.push(new Skull(500, 70, canvas));
+  skulls.push(new Skull(4000, 10, canvas));
+  skulls.push(new Skull(5000, 10, canvas));
 
   flappyDragons.push(new FlappyDragon(5000, 50));
   flappyDragons.push(new FlappyDragon(4500, 100));
@@ -141,6 +143,9 @@ function init()
   flappyGrumpys.push(new FlappyGrumpy(2000, 150));
   flappyGrumpys.push(new FlappyGrumpy(7000, 80));
   flappyGrumpys.push(new FlappyGrumpy(4000, 190));
+
+  flappyBirds.push(new FlappyBird(5250, 400, canvas));
+  flappyBirds.push(new FlappyBird(5250, 0, canvas));
 
 }
 init();
@@ -188,18 +193,24 @@ function update(elapsedTime) {
       console.log("Player: " + "(" + player.position.x + "," + player.position.y + ")");
       console.log("Flappy monster: (" + monster.position.x
         + "," + monster.position.y + ")");
+      player.state = "hit";
+      player.frame = "frame-1";
+      player.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
     }
   });
 
   // Update the flappy cats
-  flappyCats.forEach(function(cat){
-    cat.update(elapsedTime);
-    if(checkCollision(player, cat))
+  skulls.forEach(function(skull){
+    skull.update(elapsedTime);
+    if(checkCollision(player, skull))
     {
-      cat.state = "hit";
-      cat.frame = "frame-1";
-      cat.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
-      console.log("Cat collision!");
+      skull.state = "hit";
+      //skull.frame = "frame-3";
+      skull.img.src = 'assets/enemies/skull/hit/frame.png';
+      console.log("Skull collision!");
+      player.state = "hit";
+      player.frame = "frame-1";
+      player.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
     }
   });
 
@@ -208,6 +219,9 @@ function update(elapsedTime) {
     dragon.update(elapsedTime);
     if(checkCollision(player, dragon))
     {
+      player.state = "hit";
+      player.frame = "frame-1";
+      player.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
       console.log("Dragon collision! ROAR");
     }
   });
@@ -217,9 +231,28 @@ function update(elapsedTime) {
     grumpy.update(elapsedTime);
     if(checkCollision(player, grumpy))
     {
+      player.state = "hit";
+      player.frame = "frame-1";
+      player.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
       console.log("Grumpy collision! That should make you grumpy.");
     }
   });
+
+  // Update the flappy grumpys
+  flappyBirds.forEach(function(bird){
+    bird.update(elapsedTime);
+    if(checkCollision(player, bird))
+    {
+      player.state = "hit";
+      player.frame = "frame-1";
+      player.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
+      bird.state = "hit";
+      bird.frame = "frame-1";
+      bird.img.src = 'assets/enemies/flappy-bird/hit/frame-1.png';
+      console.log("Bird collision! That bird flew the coop!");
+    }
+  });
+
 
   //console.log("Player: " + "(" + player.position.x + "," + player.position.y + ")");
 
@@ -382,8 +415,8 @@ function renderWorld(elapsedTime, ctx, camera) {
     });
 
     // Render the flappy cats
-    flappyCats.forEach(function(FlappyCat){
-      FlappyCat.render(elapsedTime, ctx);
+    skulls.forEach(function(Skull){
+      Skull.render(elapsedTime, ctx);
     });
 
     // Render the flappy dragons
@@ -394,6 +427,11 @@ function renderWorld(elapsedTime, ctx, camera) {
     // Render the flappy grumpys
     flappyGrumpys.forEach(function(FlappyGrumpy){
       FlappyGrumpy.render(elapsedTime, ctx);
+    });
+
+    // Render the flappy grumpys
+    flappyBirds.forEach(function(FlappyBird){
+      FlappyBird.render(elapsedTime, ctx);
     });
 }
 
