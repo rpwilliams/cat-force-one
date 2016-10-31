@@ -26,6 +26,7 @@ function FlappyMonster(xPos, yPos) {
   this.velocity = {x: 0, y: 0};
   this.img = new Image();
   this.frame = "frame-1";
+  // http://opengameart.org/content/flappy-monster-sprite-sheets (public domain)
   this.img.src = 'assets/enemies/flappy-monster/frame-1.png';
   this.timer = 0;
   this.height = 64;
@@ -103,8 +104,6 @@ FlappyMonster.prototype.update = function(elapsedTime) {
  * @param {CanvasRenderingContext2D} ctx
  */
 FlappyMonster.prototype.render = function(elapsedTime, ctx) {
-  //var offset = this.angle * 23;
-  //console.log(this.position.x);
   ctx.save();
   ctx.translate(this.position.x, this.position.y);
   ctx.drawImage(this.img, 0, 0, this.width, this.height);

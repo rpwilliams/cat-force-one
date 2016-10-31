@@ -6,8 +6,8 @@ const Vector = require('./vector');
 const Camera = require('./camera');
 const Player = require('./player');
 const BulletPool = require('./bullet_pool');
-const FlappyMonster = require('./flappy-monster')
-
+const FlappyMonster = require('./flappy-monster');
+const FlappyCat = require('./flappy-cat');
 
 /* Global variables */
 var canvas = document.getElementById('screen');
@@ -30,7 +30,9 @@ var backgrounds = [
   new Image
 ];
 var flappyMonsters = [];
-// Public domain: http://opengameart.org/content/ruined-city-background
+var flappyCats = [];
+
+// http://opengameart.org/content/ruined-city-background (public domain)
 backgrounds[0].src = 'assets/city-foreground.png';
 backgrounds[1].src = 'assets/city-background.png';
 backgrounds[2].src = 'assets/city-sky.png';
@@ -98,6 +100,7 @@ function init()
 {
   flappyMonsters.push(new FlappyMonster(0, 0));
   flappyMonsters.push(new FlappyMonster(100, 400));
+  flappyCats.push(new FlappyCat(50, 70));
 }
 init();
 
@@ -138,16 +141,24 @@ function update(elapsedTime) {
   // Update the flappy monsters
   flappyMonsters.forEach(function(monster){
     monster.update(elapsedTime);
-  });
-
-  // Update the flappy monsters
-  flappyMonsters.forEach(function(monster){
     if(checkCollision(player, monster))
     {
       console.log("Collision!");
       console.log("Player: " + "(" + player.position.x + "," + player.position.y + ")");
       console.log("Flappy monster: (" + monster.position.x
         + "," + monster.position.y + ")");
+    }
+  });
+
+  // Update the flappy cats
+  flappyCats.forEach(function(cat){
+    cat.update(elapsedTime, false);
+    if(checkCollision(player, cat))
+    {
+      cat.state = "hit";
+      cat.frame = "frame-1";
+      cat.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
+      console.log("Cat collision!");
     }
   });
 
@@ -309,6 +320,11 @@ function renderWorld(elapsedTime, ctx, camera) {
     // Render the flappy monsters
     flappyMonsters.forEach(function(FlappyMonster){
       FlappyMonster.render(elapsedTime, ctx);
+    });
+
+    // Render the flappy cats
+    flappyCats.forEach(function(FlappyCat){
+      FlappyCat.render(elapsedTime, ctx);
     });
 }
 

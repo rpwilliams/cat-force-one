@@ -7,8 +7,8 @@ const Vector = require('./vector');
 const Camera = require('./camera');
 const Player = require('./player');
 const BulletPool = require('./bullet_pool');
-const FlappyMonster = require('./flappy-monster')
-
+const FlappyMonster = require('./flappy-monster');
+const FlappyCat = require('./flappy-cat');
 
 /* Global variables */
 var canvas = document.getElementById('screen');
@@ -31,7 +31,9 @@ var backgrounds = [
   new Image
 ];
 var flappyMonsters = [];
-// Public domain: http://opengameart.org/content/ruined-city-background
+var flappyCats = [];
+
+// http://opengameart.org/content/ruined-city-background (public domain)
 backgrounds[0].src = 'assets/city-foreground.png';
 backgrounds[1].src = 'assets/city-background.png';
 backgrounds[2].src = 'assets/city-sky.png';
@@ -99,6 +101,7 @@ function init()
 {
   flappyMonsters.push(new FlappyMonster(0, 0));
   flappyMonsters.push(new FlappyMonster(100, 400));
+  flappyCats.push(new FlappyCat(50, 70));
 }
 init();
 
@@ -139,16 +142,24 @@ function update(elapsedTime) {
   // Update the flappy monsters
   flappyMonsters.forEach(function(monster){
     monster.update(elapsedTime);
-  });
-
-  // Update the flappy monsters
-  flappyMonsters.forEach(function(monster){
     if(checkCollision(player, monster))
     {
       console.log("Collision!");
       console.log("Player: " + "(" + player.position.x + "," + player.position.y + ")");
       console.log("Flappy monster: (" + monster.position.x
         + "," + monster.position.y + ")");
+    }
+  });
+
+  // Update the flappy cats
+  flappyCats.forEach(function(cat){
+    cat.update(elapsedTime, false);
+    if(checkCollision(player, cat))
+    {
+      cat.state = "hit";
+      cat.frame = "frame-1";
+      cat.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
+      console.log("Cat collision!");
     }
   });
 
@@ -311,6 +322,11 @@ function renderWorld(elapsedTime, ctx, camera) {
     flappyMonsters.forEach(function(FlappyMonster){
       FlappyMonster.render(elapsedTime, ctx);
     });
+
+    // Render the flappy cats
+    flappyCats.forEach(function(FlappyCat){
+      FlappyCat.render(elapsedTime, ctx);
+    });
 }
 
 /**
@@ -337,7 +353,7 @@ function checkCollision(a, b)
     a.position.y < b.position.y + b.height &&
     a.position.y + a.height > b.position.y;
 }
-},{"./bullet_pool":2,"./camera":3,"./flappy-monster":4,"./game":5,"./player":6,"./vector":7}],2:[function(require,module,exports){
+},{"./bullet_pool":2,"./camera":3,"./flappy-cat":4,"./flappy-monster":5,"./game":6,"./player":7,"./vector":8}],2:[function(require,module,exports){
 "use strict";
 
 /**
@@ -519,7 +535,144 @@ Camera.prototype.toWorldCoordinates = function(screenCoordinates) {
   return Vector.add(screenCoordinates, this);
 }
 
-},{"./vector":7}],4:[function(require,module,exports){
+},{"./vector":8}],4:[function(require,module,exports){
+"use strict";
+
+/* Classes and Libraries */
+const Vector = require('./vector');
+//const Missile = require('./missile');
+
+/* Constants */
+const PLAYER_SPEED = 1;
+const MS_PER_FRAME = 1000/8;
+
+/**
+ * @module FlappyCat
+ * A class representing a player's helicopter
+ */
+module.exports = exports = FlappyCat;
+
+/**
+ * @constructor Flappy Monster
+ * Creates a flappy monster
+ * @param {xPos} the x position
+ * @param {yPos} the y position
+ */
+function FlappyCat(xPos, yPos) {
+  this.angle = 0;
+  this.position = {x: xPos, y: yPos};
+  this.velocity = {x: 0, y: 0};
+  this.img = new Image();
+  this.frame = "frame-1";
+  // http://opengameart.org/content/flappy-monster-sprite-sheets (public domain)
+  this.img.src = 'assets/enemies/flappy-cat/flying/frame-1.png';
+  this.timer = 0;
+  this.state = "flying";
+  this.height = 64;
+  this.width = 64;
+
+  var self = this;
+  self.animate = function(time)
+  {
+    self.timer += time;
+    if(self.timer > MS_PER_FRAME)
+    {
+      self.timer = 0;
+      if(self.state = "flying")
+      {
+        switch(self.frame)
+        {
+          case 'frame-1':
+            self.frame = 'frame-2';
+            self.img.src = 'assets/enemies/flappy-cat/flying/frame-2.png';
+            break;
+          case 'frame-2':
+            self.frame = 'frame-3';
+            self.img.src = 'assets/enemies/flappy-cat/flying/frame-3.png';
+            break;
+          case 'frame-3':
+            self.frame = 'frame-4';
+            self.img.src = 'assets/enemies/flappy-cat/flying/frame-4.png';
+            break;
+          case 'frame-4':
+            self.frame = 'frame-5';
+            self.img.src = 'assets/enemies/flappy-cat/flying/frame-5.png';
+            break;
+          case 'frame-5':
+            self.frame = 'frame-6';
+            self.img.src = 'assets/enemies/flappy-cat/flying/frame-6.png';
+            break;
+          case 'frame-6':
+            self.frame = 'frame-7';
+            self.img.src = 'assets/enemies/flappy-cat/flying/frame-7.png';
+            break;
+          case 'frame-7':
+            self.frame = 'frame-8';
+            self.img.src = 'assets/enemies/flappy-cat/flying/frame-8.png';
+            break;
+          case 'frame-8':
+            self.frame = 'frame-1';
+            self.img.src = 'assets/enemies/flappy-cat/flying/frame-1.png';
+            break;
+        }
+      }
+      else
+      {
+        switch(self.frame)
+        {
+          case 'frame-1':
+            self.frame = 'frame-2';
+            self.img.src = 'assets/enemies/flappy-cat/hit/frame-2.png';
+            break;
+          case 'frame-2':
+            self.frame = 'frame-1';
+            self.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
+            break;
+        }
+      }
+    }  
+  }
+}
+
+
+/**
+ * @function update
+ * Updates the flappy monster based on the supplied input
+ * @param {DOMHighResTimeStamp} elapedTime
+ */
+FlappyCat.prototype.update = function(elapsedTime) {
+  // move the player
+  this.velocity.x += PLAYER_SPEED;
+  this.position.x += PLAYER_SPEED;
+
+  // don't let the player move off-screen
+  //if(this.position.x < 0) this.position.x = 0;
+  //if(this.position.x > 1024) this.position.x = 1024;
+  //if(this.position.y > 786) this.position.y = 786;
+
+  // animate the monster
+  this.animate(elapsedTime);
+}
+
+/**
+ * @function render
+ * Renders the flappy monster in world coordinates
+ * @param {DOMHighResTimeStamp} elapsedTime
+ * @param {CanvasRenderingContext2D} ctx
+ */
+FlappyCat.prototype.render = function(elapsedTime, ctx) {
+  ctx.save();
+  ctx.translate(this.position.x, this.position.y);
+  ctx.drawImage(this.img, 0, 0, this.width, this.height);
+  ctx.restore();
+}
+
+
+  
+
+
+
+},{"./vector":8}],5:[function(require,module,exports){
 "use strict";
 
 /* Classes and Libraries */
@@ -548,6 +701,7 @@ function FlappyMonster(xPos, yPos) {
   this.velocity = {x: 0, y: 0};
   this.img = new Image();
   this.frame = "frame-1";
+  // http://opengameart.org/content/flappy-monster-sprite-sheets (public domain)
   this.img.src = 'assets/enemies/flappy-monster/frame-1.png';
   this.timer = 0;
   this.height = 64;
@@ -625,8 +779,6 @@ FlappyMonster.prototype.update = function(elapsedTime) {
  * @param {CanvasRenderingContext2D} ctx
  */
 FlappyMonster.prototype.render = function(elapsedTime, ctx) {
-  //var offset = this.angle * 23;
-  //console.log(this.position.x);
   ctx.save();
   ctx.translate(this.position.x, this.position.y);
   ctx.drawImage(this.img, 0, 0, this.width, this.height);
@@ -638,7 +790,7 @@ FlappyMonster.prototype.render = function(elapsedTime, ctx) {
 
 
 
-},{"./vector":7}],5:[function(require,module,exports){
+},{"./vector":8}],6:[function(require,module,exports){
 "use strict";
 
 /**
@@ -696,7 +848,7 @@ Game.prototype.loop = function(newTime) {
   this.frontCtx.drawImage(this.backBuffer, 0, 0);
 }
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 "use strict";
 
 /* Classes and Libraries */
@@ -803,7 +955,7 @@ Player.prototype.fireMissile = function() {
   }
 }
 
-},{"./vector":7}],7:[function(require,module,exports){
+},{"./vector":8}],8:[function(require,module,exports){
 "use strict";
 
 /**
