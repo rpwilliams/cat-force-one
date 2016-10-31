@@ -9,6 +9,7 @@ const BulletPool = require('./bullet_pool');
 const FlappyMonster = require('./flappy-monster');
 const FlappyCat = require('./flappy-cat');
 const FlappyDragon = require('./flappy-dragon');
+const FlappyGrumpy = require('./flappy-grumpy')
 
 /* Global variables */
 var canvas = document.getElementById('screen');
@@ -33,6 +34,7 @@ var backgrounds = [
 var flappyMonsters = [];
 var flappyCats = [];
 var flappyDragons = [];
+var flappyGrumpys = [];
 
 // http://opengameart.org/content/ruined-city-background (public domain)
 backgrounds[0].src = 'assets/city-foreground.png';
@@ -106,12 +108,14 @@ function init()
   flappyMonsters.push(new FlappyMonster(1500, 400));
   flappyMonsters.push(new FlappyMonster(2000, 225));
   flappyMonsters.push(new FlappyMonster(3000, 225));
+
   flappyCats.push(new FlappyCat(50, 70, canvas));
   flappyCats.push(new FlappyCat(1000, 200, canvas));
   flappyCats.push(new FlappyCat(2000, 10, canvas));
   flappyCats.push(new FlappyCat(500, 70, canvas));
   flappyCats.push(new FlappyCat(4000, 10, canvas));
   flappyCats.push(new FlappyCat(5000, 10, canvas));
+
   flappyDragons.push(new FlappyDragon(5000, 50));
   flappyDragons.push(new FlappyDragon(4500, 100));
   flappyDragons.push(new FlappyDragon(4000, 60));
@@ -130,6 +134,14 @@ function init()
   flappyDragons.push(new FlappyDragon(11000, 200));
   flappyDragons.push(new FlappyDragon(12000, 10));
   flappyDragons.push(new FlappyDragon(12000, 200));
+
+  flappyGrumpys.push(new FlappyGrumpy(5000, 300));
+  flappyGrumpys.push(new FlappyGrumpy(6000, 200));
+  flappyGrumpys.push(new FlappyGrumpy(1000, 0));
+  flappyGrumpys.push(new FlappyGrumpy(2000, 150));
+  flappyGrumpys.push(new FlappyGrumpy(7000, 80));
+  flappyGrumpys.push(new FlappyGrumpy(4000, 190));
+
 }
 init();
 
@@ -197,6 +209,15 @@ function update(elapsedTime) {
     if(checkCollision(player, dragon))
     {
       console.log("Dragon collision! ROAR");
+    }
+  });
+
+  // Update the flappy grumpys
+  flappyGrumpys.forEach(function(grumpy){
+    grumpy.update(elapsedTime);
+    if(checkCollision(player, grumpy))
+    {
+      console.log("Grumpy collision! That should make you grumpy.");
     }
   });
 
@@ -365,9 +386,14 @@ function renderWorld(elapsedTime, ctx, camera) {
       FlappyCat.render(elapsedTime, ctx);
     });
 
-    // Render the flappy cats
+    // Render the flappy dragons
     flappyDragons.forEach(function(FlappyDragon){
       FlappyDragon.render(elapsedTime, ctx);
+    });
+
+    // Render the flappy grumpys
+    flappyGrumpys.forEach(function(FlappyGrumpy){
+      FlappyGrumpy.render(elapsedTime, ctx);
     });
 }
 

@@ -10,6 +10,7 @@ const BulletPool = require('./bullet_pool');
 const FlappyMonster = require('./flappy-monster');
 const FlappyCat = require('./flappy-cat');
 const FlappyDragon = require('./flappy-dragon');
+const FlappyGrumpy = require('./flappy-grumpy')
 
 /* Global variables */
 var canvas = document.getElementById('screen');
@@ -34,6 +35,7 @@ var backgrounds = [
 var flappyMonsters = [];
 var flappyCats = [];
 var flappyDragons = [];
+var flappyGrumpys = [];
 
 // http://opengameart.org/content/ruined-city-background (public domain)
 backgrounds[0].src = 'assets/city-foreground.png';
@@ -107,12 +109,14 @@ function init()
   flappyMonsters.push(new FlappyMonster(1500, 400));
   flappyMonsters.push(new FlappyMonster(2000, 225));
   flappyMonsters.push(new FlappyMonster(3000, 225));
+
   flappyCats.push(new FlappyCat(50, 70, canvas));
   flappyCats.push(new FlappyCat(1000, 200, canvas));
   flappyCats.push(new FlappyCat(2000, 10, canvas));
   flappyCats.push(new FlappyCat(500, 70, canvas));
   flappyCats.push(new FlappyCat(4000, 10, canvas));
   flappyCats.push(new FlappyCat(5000, 10, canvas));
+
   flappyDragons.push(new FlappyDragon(5000, 50));
   flappyDragons.push(new FlappyDragon(4500, 100));
   flappyDragons.push(new FlappyDragon(4000, 60));
@@ -131,6 +135,14 @@ function init()
   flappyDragons.push(new FlappyDragon(11000, 200));
   flappyDragons.push(new FlappyDragon(12000, 10));
   flappyDragons.push(new FlappyDragon(12000, 200));
+
+  flappyGrumpys.push(new FlappyGrumpy(5000, 300));
+  flappyGrumpys.push(new FlappyGrumpy(6000, 200));
+  flappyGrumpys.push(new FlappyGrumpy(1000, 0));
+  flappyGrumpys.push(new FlappyGrumpy(2000, 150));
+  flappyGrumpys.push(new FlappyGrumpy(7000, 80));
+  flappyGrumpys.push(new FlappyGrumpy(4000, 190));
+
 }
 init();
 
@@ -198,6 +210,15 @@ function update(elapsedTime) {
     if(checkCollision(player, dragon))
     {
       console.log("Dragon collision! ROAR");
+    }
+  });
+
+  // Update the flappy grumpys
+  flappyGrumpys.forEach(function(grumpy){
+    grumpy.update(elapsedTime);
+    if(checkCollision(player, grumpy))
+    {
+      console.log("Grumpy collision! That should make you grumpy.");
     }
   });
 
@@ -366,9 +387,14 @@ function renderWorld(elapsedTime, ctx, camera) {
       FlappyCat.render(elapsedTime, ctx);
     });
 
-    // Render the flappy cats
+    // Render the flappy dragons
     flappyDragons.forEach(function(FlappyDragon){
       FlappyDragon.render(elapsedTime, ctx);
+    });
+
+    // Render the flappy grumpys
+    flappyGrumpys.forEach(function(FlappyGrumpy){
+      FlappyGrumpy.render(elapsedTime, ctx);
     });
 }
 
@@ -396,7 +422,7 @@ function checkCollision(a, b)
     a.position.y < b.position.y + b.height &&
     a.position.y + a.height > b.position.y;
 }
-},{"./bullet_pool":2,"./camera":3,"./flappy-cat":4,"./flappy-dragon":5,"./flappy-monster":6,"./game":7,"./player":8,"./vector":9}],2:[function(require,module,exports){
+},{"./bullet_pool":2,"./camera":3,"./flappy-cat":4,"./flappy-dragon":5,"./flappy-grumpy":6,"./flappy-monster":7,"./game":8,"./player":9,"./vector":10}],2:[function(require,module,exports){
 "use strict";
 
 /**
@@ -578,7 +604,7 @@ Camera.prototype.toWorldCoordinates = function(screenCoordinates) {
   return Vector.add(screenCoordinates, this);
 }
 
-},{"./vector":9}],4:[function(require,module,exports){
+},{"./vector":10}],4:[function(require,module,exports){
 "use strict";
 
 /* Classes and Libraries */
@@ -741,7 +767,7 @@ FlappyCat.prototype.render = function(elapsedTime, ctx) {
 
 
 
-},{"./vector":9}],5:[function(require,module,exports){
+},{"./vector":10}],5:[function(require,module,exports){
 "use strict";
 
 /* Classes and Libraries */
@@ -843,7 +869,125 @@ FlappyDragon.prototype.render = function(elapsedTime, ctx) {
 
 
 
-},{"./vector":9}],6:[function(require,module,exports){
+},{"./vector":10}],6:[function(require,module,exports){
+"use strict";
+
+/* Classes and Libraries */
+const Vector = require('./vector');
+//const Missile = require('./missile');
+
+/* Constants */
+const PLAYER_SPEED = -2.5;
+const MS_PER_FRAME = 1000/8;
+
+/**
+ * @module FlappyGrumpy
+ * A class representing a player's helicopter
+ */
+module.exports = exports = FlappyGrumpy;
+
+/**
+ * @constructor Flappy Monster
+ * Creates a flappy monster
+ * @param {xPos} the x position
+ * @param {yPos} the y position
+ */
+function FlappyGrumpy(xPos, yPos) {
+  this.angle = 0;
+  this.position = {x: xPos, y: yPos};
+  this.velocity = {x: 0, y: 0};
+  this.img = new Image();
+  this.frame = "frame-1";
+  // http://opengameart.org/content/flappy-monster-sprite-sheets (public domain)
+  this.img.src = 'assets/enemies/flappy-grumpy/frame-1.png';
+  this.timer = 0;
+  this.height = 64;
+  this.width = 64;
+
+  var self = this;
+  self.animate = function(time)
+  {
+    self.timer += time;
+    if(self.timer > MS_PER_FRAME)
+    {
+      self.timer = 0;
+      switch(self.frame)
+      {
+        case 'frame-1':
+          self.frame = 'frame-2';
+          self.img.src = 'assets/enemies/flappy-grumpy/frame-2.png';
+          break;
+        case 'frame-2':
+          self.frame = 'frame-3';
+          self.img.src = 'assets/enemies/flappy-grumpy/frame-3.png';
+          break;
+        case 'frame-3':
+          self.frame = 'frame-4';
+          self.img.src = 'assets/enemies/flappy-grumpy/frame-4.png';
+          break;
+        case 'frame-4':
+          self.frame = 'frame-5';
+          self.img.src = 'assets/enemies/flappy-grumpy/frame-5.png';
+          break;
+        case 'frame-5':
+          self.frame = 'frame-6';
+          self.img.src = 'assets/enemies/flappy-grumpy/frame-6.png';
+          break;
+        case 'frame-6':
+          self.frame = 'frame-7';
+          self.img.src = 'assets/enemies/flappy-grumpy/frame-7.png';
+          break;
+        case 'frame-7':
+          self.frame = 'frame-8';
+          self.img.src = 'assets/enemies/flappy-grumpy/frame-8.png';
+          break;
+        case 'frame-8':
+          self.frame = 'frame-1';
+          self.img.src = 'assets/enemies/flappy-grumpy/frame-1.png';
+          break;
+      }
+    }
+  }
+}
+
+/**
+ * @function update
+ * Updates the flappy monster based on the supplied input
+ * @param {DOMHighResTimeStamp} elapedTime
+ */
+FlappyGrumpy.prototype.update = function(elapsedTime) {
+  // move the player
+  this.velocity.x += PLAYER_SPEED;
+  this.position.x += PLAYER_SPEED;
+
+  // don't let the player move off-screen
+  //if(this.position.x < 0) this.position.x = 0;
+  //if(this.position.x > 1024) this.position.x = 1024;
+  //if(this.position.y > 786) this.position.y = 786;
+
+  // animate the monster
+  this.animate(elapsedTime);
+}
+
+/**
+ * @function render
+ * Renders the flappy monster in world coordinates
+ * @param {DOMHighResTimeStamp} elapsedTime
+ * @param {CanvasRenderingContext2D} ctx
+ */
+FlappyGrumpy.prototype.render = function(elapsedTime, ctx) {
+  ctx.save();
+  ctx.translate(this.position.x, this.position.y);
+  ctx.drawImage(this.img, 0, 0, this.width, this.height);
+  ctx.restore();
+}
+
+
+  
+
+
+
+},{"./vector":10}],7:[function(require,module,exports){
 "use strict";
 
 /* Classes and Libraries */
@@ -961,7 +1105,7 @@ FlappyMonster.prototype.render = function(elapsedTime, ctx) {
 
 
 
-},{"./vector":9}],7:[function(require,module,exports){
+},{"./vector":10}],8:[function(require,module,exports){
 "use strict";
 
 /**
@@ -1019,7 +1163,7 @@ Game.prototype.loop = function(newTime) {
   this.frontCtx.drawImage(this.backBuffer, 0, 0);
 }
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 
 /* Classes and Libraries */
@@ -1126,7 +1270,7 @@ Player.prototype.fireMissile = function() {
   }
 }
 
-},{"./vector":9}],9:[function(require,module,exports){
+},{"./vector":10}],10:[function(require,module,exports){
 "use strict";
 
 /**
