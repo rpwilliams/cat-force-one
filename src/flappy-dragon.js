@@ -20,14 +20,13 @@ module.exports = exports = FlappyDragon;
  * @param {xPos} the x position
  * @param {yPos} the y position
  */
-function FlappyDragon(xPos, yPos) {
+function FlappyDragon(xPos, yPos, img) {
   this.angle = 0;
   this.position = {x: xPos, y: yPos};
   this.velocity = {x: 0, y: 0};
-  this.img = new Image();
+  this.img = img[0];
   this.frame = "frame-1";
   // http://opengameart.org/content/flappy-monster-sprite-sheets (public domain)
-  this.img.src = 'assets/enemies/flappy-dragon/frame-1.png';
   this.timer = 0;
   this.height = 64;
   this.width = 64;
@@ -44,19 +43,19 @@ function FlappyDragon(xPos, yPos) {
       {
         case 'frame-1':
           self.frame = 'frame-2';
-          self.img.src = 'assets/enemies/flappy-dragon/frame-2.png';
+          self.img = img[1];
           break;
         case 'frame-2':
           self.frame = 'frame-3';
-          self.img.src = 'assets/enemies/flappy-dragon/frame-3.png';
+          self.img = img[2];
           break;
         case 'frame-3':
           self.frame = 'frame-4';
-          self.img.src = 'assets/enemies/flappy-dragon/frame-4.png';
+          self.img = img[3];
           break;
         case 'frame-4':
           self.frame = 'frame-1';
-          self.img.src = 'assets/enemies/flappy-dragon/frame-1.png';
+          self.img = img[0];
           break;
       }
     }

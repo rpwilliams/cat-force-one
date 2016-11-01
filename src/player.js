@@ -9,14 +9,14 @@ const PLAYER_SPEED = 5;
 const BULLET_SPEED = 10;
 const MS_PER_FRAME = 1000/8;
 
-var img1 = 'assets/enemies/flappy-cat/flying/frame-1.png';
-var img2 = 'assets/enemies/flappy-cat/flying/frame-2.png';
-var img3 = 'assets/enemies/flappy-cat/flying/frame-3.png';
-var img4 = 'assets/enemies/flappy-cat/flying/frame-4.png';
-var img5 = 'assets/enemies/flappy-cat/flying/frame-5.png';
-var img6 = 'assets/enemies/flappy-cat/flying/frame-6.png';
-var img7 = 'assets/enemies/flappy-cat/flying/frame-7.png';
-var img8 = 'assets/enemies/flappy-cat/flying/frame-8.png';
+// var img1 = 'assets/enemies/flappy-cat/flying/frame-1.png';
+// var img2 = 'assets/enemies/flappy-cat/flying/frame-2.png';
+// var img3 = 'assets/enemies/flappy-cat/flying/frame-3.png';
+// var img4 = 'assets/enemies/flappy-cat/flying/frame-4.png';
+// var img5 = 'assets/enemies/flappy-cat/flying/frame-5.png';
+// var img6 = 'assets/enemies/flappy-cat/flying/frame-6.png';
+// var img7 = 'assets/enemies/flappy-cat/flying/frame-7.png';
+// var img8 = 'assets/enemies/flappy-cat/flying/frame-8.png';
 
 /**
  * @module Player
@@ -29,21 +29,22 @@ module.exports = exports = Player;
  * Creates a player
  * @param {BulletPool} bullets the bullet pool
  */
-function Player(bullets, missiles, weapon) {
+function Player(bullets, missiles, weapon, img) {
   this.missiles = missiles;
   this.missileCount = 4;
   this.bullets = bullets;
   this.angle = 0;
   this.position = {x: 200, y: 200};
   this.velocity = {x: 0, y: 0};
-  this.img = new Image()
-  this.img.src = 'assets/player/flappy-cat/flying/frame-1.png';
+  //this.img = new Image()
+  //this.img.src = 'assets/player/flappy-cat/flying/frame-1.png';
   this.width = 64 + (64 * .5);
   this.height = 64 + (64 * .5);
   this.state = "flying";
   this.timer = 0;
   this.frame = 'frame-1';
   this.weapon = weapon;
+  this.img = img[0];
 
   var self = this;
   self.animate = function(time)
@@ -58,35 +59,35 @@ function Player(bullets, missiles, weapon) {
         {
           case 'frame-1':
             self.frame = 'frame-2';
-            self.img.src = img1;
+            self.img = img[0];
             break;
           case 'frame-2':
             self.frame = 'frame-3';
-            self.img.src = img2;
+            self.img = img[1];
             break;
           case 'frame-3':
             self.frame = 'frame-4';
-            self.img.src = img3;
+            self.img = img[2];
             break;
           case 'frame-4':
             self.frame = 'frame-5';
-            self.img.src = img4;
+            self.img = img[3];
             break;
           case 'frame-5':
             self.frame = 'frame-6';
-            self.img.src = img5;
+            self.img = img[4];
             break;
           case 'frame-6':
             self.frame = 'frame-7';
-            self.img.src = img6;
+            self.img = img[5];
             break;
           case 'frame-7':
             self.frame = 'frame-8';
-            self.img.src = img7;
+            self.img = img[6];
             break;
           case 'frame-8':
             self.frame = 'frame-1';
-            self.img.src = img8;
+            self.img = img[7];
             break;
         }
       }
@@ -94,13 +95,13 @@ function Player(bullets, missiles, weapon) {
       {
         switch(self.frame)
         {
-          case 'frame-1':
-            self.frame = 'frame-2';
-            self.img.src = 'assets/enemies/flappy-cat/hit/frame-2.png';
+          case 'frame-9':
+            self.frame = 'frame-10';
+            self.img = img[8];
             break;
-          case 'frame-2':
-            self.frame = 'frame-1';
-            self.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
+          case 'frame-10':
+            self.frame = 'frame-9';
+            self.img = img[9];
             break;
         }
       }

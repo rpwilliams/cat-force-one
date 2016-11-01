@@ -20,16 +20,15 @@ module.exports = exports = Skull;
  * @param {xPos} the x position
  * @param {yPos} the y position
  */
-function Skull(xPos, yPos, canvas) {
+function Skull(xPos, yPos, canvas, img) {
   this.worldWidth = canvas.width;
   this.worldHeight = canvas.height;
   this.angle = 0;
   this.position = {x: xPos, y: yPos};
   this.velocity = {x: 0, y: 0};
-  this.img = new Image();
+  this.img = img[0];
   this.frame = "frame-1";
   // http://opengameart.org/content/flappy-monster-sprite-sheets (public domain)
-  this.img.src = 'assets/enemies/skull/idle/frame-1.png';
   this.timer = 0;
   this.state = "idle";
   this.height = 64;
@@ -50,18 +49,18 @@ function Skull(xPos, yPos, canvas) {
         {
           case 'frame-1':
             self.frame = 'frame-2';
-            self.img.src = 'assets/enemies/skull/idle/frame-2.png';
+            self.img = img[1];
             break;
           case 'frame-2':
             self.frame = 'frame-1';
-            self.img.src = 'assets/enemies/skull/idle/frame-1.png';
+            self.img = img[0];
             break;
         }
       }
       else
       {
         self.frame = 'frame-3';
-        self.img.src = 'assets/enemies/skull/hit/frame.png';
+        self.img = img[2];
       }
     }  
   }

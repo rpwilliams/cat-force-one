@@ -20,22 +20,23 @@ module.exports = exports = FlappyBird;
  * @param {xPos} the x position
  * @param {yPos} the y position
  */
-function FlappyBird(xPos, yPos, canvas) {
+function FlappyBird(xPos, yPos, canvas, img) {
   this.worldWidth = canvas.width;
   this.worldHeight = canvas.height;
   this.angle = 0;
   this.position = {x: xPos, y: yPos};
   this.velocity = {x: 0, y: 0};
-  this.img = new Image();
+  //this.img = new Image();
   this.frame = "frame-1";
   // http://opengameart.org/content/flappy-monster-sprite-sheets (public domain)
-  this.img.src = 'assets/enemies/flappy-bird/flying/frame-1.png';
+  //this.img.src = 'assets/enemies/flappy-bird/flying/frame-1.png';
   this.timer = 0;
   this.state = "flying";
   this.height = 128 * 3;
   this.width = 128 * 3;
   this.initialAcceleration = true; 
   this.active = true;
+  this.img = img[0];
 
   var self = this;
   self.animate = function(time)
@@ -50,19 +51,23 @@ function FlappyBird(xPos, yPos, canvas) {
         {
           case 'frame-1':
             self.frame = 'frame-2';
-            self.img.src = 'assets/enemies/flappy-bird/flying/frame-2.png';
+            //self.img.src = 'assets/enemies/flappy-bird/flying/frame-2.png';
+            self.img = img[1];
             break;
           case 'frame-2':
             self.frame = 'frame-3';
-            self.img.src = 'assets/enemies/flappy-bird/flying/frame-3.png';
+            //self.img.src = 'assets/enemies/flappy-bird/flying/frame-3.png';
+            self.img = img[2];
             break;
           case 'frame-3':
             self.frame = 'frame-4';
-            self.img.src = 'assets/enemies/flappy-bird/flying/frame-4.png';
+            //self.img.src = 'assets/enemies/flappy-bird/flying/frame-4.png';
+            self.img = img[3];
             break;
           case 'frame-4':
             self.frame = 'frame-1';
-            self.img.src = 'assets/enemies/flappy-bird/flying/frame-1.png';
+            //self.img.src = 'assets/enemies/flappy-bird/flying/frame-1.png';
+            self.img = img[0];
             break;
         }
       }
@@ -70,13 +75,15 @@ function FlappyBird(xPos, yPos, canvas) {
       {
         switch(self.frame)
         {
-          case 'frame-1':
-            self.frame = 'frame-2';
-            self.img.src = 'assets/enemies/flappy-bird/hit/frame-2.png';
+          case 'frame-5':
+            self.frame = 'frame-6';
+            //self.img.src = 'assets/enemies/flappy-bird/hit/frame-2.png';
+            self.img = img[5];
             break;
-          case 'frame-2':
-            self.frame = 'frame-1';
-            self.img.src = 'assets/enemies/flappy-bird/hit/frame-1.png';
+          case 'frame-6':
+            self.frame = 'frame-5';
+            //self.img.src = 'assets/enemies/flappy-bird/hit/frame-1.png';
+            self.img = img[4];
             break;
         }
       }

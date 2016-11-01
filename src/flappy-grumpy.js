@@ -20,14 +20,13 @@ module.exports = exports = FlappyGrumpy;
  * @param {xPos} the x position
  * @param {yPos} the y position
  */
-function FlappyGrumpy(xPos, yPos) {
+function FlappyGrumpy(xPos, yPos, img) {
   this.angle = 0;
   this.position = {x: xPos, y: yPos};
   this.velocity = {x: 0, y: 0};
-  this.img = new Image();
+  this.img =  img[0];
   this.frame = "frame-1";
   // http://opengameart.org/content/flappy-monster-sprite-sheets (public domain)
-  this.img.src = 'assets/enemies/flappy-grumpy/frame-1.png';
   this.timer = 0;
   this.height = 64;
   this.width = 64;
@@ -44,35 +43,35 @@ function FlappyGrumpy(xPos, yPos) {
       {
         case 'frame-1':
           self.frame = 'frame-2';
-          self.img.src = 'assets/enemies/flappy-grumpy/frame-2.png';
+          self.img = img[1];
           break;
         case 'frame-2':
           self.frame = 'frame-3';
-          self.img.src = 'assets/enemies/flappy-grumpy/frame-3.png';
+          self.img = img[2];
           break;
         case 'frame-3':
           self.frame = 'frame-4';
-          self.img.src = 'assets/enemies/flappy-grumpy/frame-4.png';
+          self.img = img[3];
           break;
         case 'frame-4':
           self.frame = 'frame-5';
-          self.img.src = 'assets/enemies/flappy-grumpy/frame-5.png';
+          self.img = img[4];
           break;
         case 'frame-5':
           self.frame = 'frame-6';
-          self.img.src = 'assets/enemies/flappy-grumpy/frame-6.png';
+          self.img = img[5];
           break;
         case 'frame-6':
           self.frame = 'frame-7';
-          self.img.src = 'assets/enemies/flappy-grumpy/frame-7.png';
+          self.img = img[6];
           break;
         case 'frame-7':
           self.frame = 'frame-8';
-          self.img.src = 'assets/enemies/flappy-grumpy/frame-8.png';
+          self.img = img[7];
           break;
         case 'frame-8':
           self.frame = 'frame-1';
-          self.img.src = 'assets/enemies/flappy-grumpy/frame-1.png';
+          self.img = img[0];
           break;
       }
     }

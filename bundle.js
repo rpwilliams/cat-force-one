@@ -28,7 +28,7 @@ var input = {
 var camera = new Camera(canvas);
 var bullets = new BulletPool(10);
 var missiles = [];
-var player = new Player(bullets, missiles, "weapon-1");
+var player;
 var backgrounds = [
   new Image(),
   new Image(),
@@ -44,6 +44,12 @@ var reticule = {
   x: 0,
   y: 0
 }
+var playerImg = [];
+var flappyBirdImg = [];
+var flappyMonsterImg = [];
+var skullImg = [];
+var flappyDragonImg = [];
+var flappyGrumpyImg = [];
 
 /**
  * @function onmousemove
@@ -140,13 +146,110 @@ window.onkeyup = function(event) {
 /**
  * @function init
  * Initializes the game
+ * Loads all animation images BEFORE animation to avoid flickering
  */
 function init()
 {
-  // http://opengameart.org/content/ruined-city-background (public domain)
+  /*
+    All images are public domain and from opengameart.org
+   */
+
+  // Load the background images
   backgrounds[0].src = 'assets/city-foreground.png';
   backgrounds[1].src = 'assets/city-background.png';
   backgrounds[2].src = 'assets/city-sky.png';
+
+  // Load the player (cat) images
+  playerImg[0] = new Image();
+  playerImg[1] = new Image();
+  playerImg[2] = new Image();
+  playerImg[3] = new Image();
+  playerImg[4] = new Image();
+  playerImg[5] = new Image();
+  playerImg[6] = new Image();
+  playerImg[7] = new Image();
+  playerImg[8] = new Image();
+  playerImg[9] = new Image();
+  playerImg[0].src = 'assets/enemies/flappy-cat/flying/frame-1.png';
+  playerImg[1].src = 'assets/enemies/flappy-cat/flying/frame-2.png';
+  playerImg[2].src = 'assets/enemies/flappy-cat/flying/frame-3.png';
+  playerImg[3].src = 'assets/enemies/flappy-cat/flying/frame-4.png';
+  playerImg[4].src = 'assets/enemies/flappy-cat/flying/frame-5.png';
+  playerImg[5].src = 'assets/enemies/flappy-cat/flying/frame-6.png';
+  playerImg[6].src = 'assets/enemies/flappy-cat/flying/frame-7.png';
+  playerImg[7].src = 'assets/enemies/flappy-cat/flying/frame-8.png';
+  playerImg[8].src = 'assets/enemies/flappy-cat/hit/frame-2.png';
+  playerImg[9].src = 'assets/enemies/flappy-cat/hit/frame-1.png';
+
+  // Load the flappy monster images
+  flappyMonsterImg[0] = new Image();
+  flappyMonsterImg[1] = new Image();
+  flappyMonsterImg[2] = new Image();
+  flappyMonsterImg[3] = new Image();
+  flappyMonsterImg[4] = new Image();
+  flappyMonsterImg[5] = new Image();
+  flappyMonsterImg[6] = new Image();
+  flappyMonsterImg[7] = new Image();
+  flappyMonsterImg[0].src = 'assets/enemies/flappy-monster/frame-1.png';
+  flappyMonsterImg[1].src = 'assets/enemies/flappy-monster/frame-2.png';
+  flappyMonsterImg[2].src = 'assets/enemies/flappy-monster/frame-3.png';
+  flappyMonsterImg[3].src = 'assets/enemies/flappy-monster/frame-4.png';
+  flappyMonsterImg[4].src = 'assets/enemies/flappy-monster/frame-5.png';
+  flappyMonsterImg[5].src = 'assets/enemies/flappy-monster/frame-6.png';
+  flappyMonsterImg[6].src = 'assets/enemies/flappy-monster/frame-7.png';
+  flappyMonsterImg[7].src = 'assets/enemies/flappy-monster/frame-8.png';
+
+  // Load the flappy bird images
+  flappyBirdImg[0] = new Image();
+  flappyBirdImg[1] = new Image();
+  flappyBirdImg[2] = new Image();
+  flappyBirdImg[3] = new Image();
+  flappyBirdImg[4] = new Image();
+  flappyBirdImg[5] = new Image();
+  flappyBirdImg[0].src = 'assets/enemies/flappy-bird/flying/frame-1.png';
+  flappyBirdImg[1].src = 'assets/enemies/flappy-bird/flying/frame-2.png';
+  flappyBirdImg[2].src = 'assets/enemies/flappy-bird/flying/frame-3.png';
+  flappyBirdImg[3].src = 'assets/enemies/flappy-bird/flying/frame-4.png';
+  flappyBirdImg[4].src = 'assets/enemies/flappy-bird/hit/frame-1.png';
+  flappyBirdImg[5].src = 'assets/enemies/flappy-bird/hit/frame-2.png';
+
+  // Load the skull images
+  skullImg[0] = new Image();
+  skullImg[1] = new Image();
+  skullImg[2] = new Image();
+  skullImg[0].src = 'assets/enemies/skull/idle/frame-1.png';
+  skullImg[1].src = 'assets/enemies/skull/idle/frame-2.png';
+  skullImg[2].src = 'assets/enemies/skull/hit/frame.png';
+
+  // Load the flappy dragon images
+  flappyDragonImg[0] = new Image();
+  flappyDragonImg[1] = new Image();
+  flappyDragonImg[2] = new Image();
+  flappyDragonImg[3] = new Image();
+  flappyDragonImg[0].src = 'assets/enemies/flappy-dragon/frame-1.png';
+  flappyDragonImg[1].src = 'assets/enemies/flappy-dragon/frame-2.png';
+  flappyDragonImg[2].src = 'assets/enemies/flappy-dragon/frame-3.png';
+  flappyDragonImg[3].src = 'assets/enemies/flappy-dragon/frame-4.png';
+
+  // Load the flappy grumpy images
+  flappyGrumpyImg[0] = new Image();
+  flappyGrumpyImg[1] = new Image();
+  flappyGrumpyImg[2] = new Image();
+  flappyGrumpyImg[3] = new Image();
+  flappyGrumpyImg[4] = new Image();
+  flappyGrumpyImg[5] = new Image();
+  flappyGrumpyImg[6] = new Image();
+  flappyGrumpyImg[7] = new Image();
+  flappyGrumpyImg[0].src = 'assets/enemies/flappy-grumpy/frame-1.png';
+  flappyGrumpyImg[1].src = 'assets/enemies/flappy-grumpy/frame-2.png';
+  flappyGrumpyImg[2].src = 'assets/enemies/flappy-grumpy/frame-3.png';
+  flappyGrumpyImg[3].src = 'assets/enemies/flappy-grumpy/frame-4.png';
+  flappyGrumpyImg[4].src = 'assets/enemies/flappy-grumpy/frame-5.png';
+  flappyGrumpyImg[5].src = 'assets/enemies/flappy-grumpy/frame-6.png';
+  flappyGrumpyImg[6].src = 'assets/enemies/flappy-grumpy/frame-7.png';
+  flappyGrumpyImg[7].src = 'assets/enemies/flappy-grumpy/frame-8.png';
+
+  player = new Player(bullets, missiles, "weapon-1", playerImg);
 
   powerUps.push(new Powerup(50,50));
   powerUps.push(new Powerup(1000,50));
@@ -154,49 +257,48 @@ function init()
   powerUps.push(new Powerup(3000,50));
   powerUps.push(new Powerup(4000,50));
 
+  flappyMonsters.push(new FlappyMonster(0, 0, flappyMonsterImg));
+  flappyMonsters.push(new FlappyMonster(500, 20, flappyMonsterImg));
+  flappyMonsters.push(new FlappyMonster(1000, 80, flappyMonsterImg));
+  flappyMonsters.push(new FlappyMonster(1500, 400, flappyMonsterImg));
+  flappyMonsters.push(new FlappyMonster(2000, 225, flappyMonsterImg));
+  flappyMonsters.push(new FlappyMonster(3000, 225, flappyMonsterImg));
 
-  flappyMonsters.push(new FlappyMonster(0, 0));
-  flappyMonsters.push(new FlappyMonster(500, 20));
-  flappyMonsters.push(new FlappyMonster(1000, 80));
-  flappyMonsters.push(new FlappyMonster(1500, 400));
-  flappyMonsters.push(new FlappyMonster(2000, 225));
-  flappyMonsters.push(new FlappyMonster(3000, 225));
+  skulls.push(new Skull(50, 70, canvas, skullImg));
+  skulls.push(new Skull(1000, 200, canvas, skullImg));
+  skulls.push(new Skull(2000, 10, canvas, skullImg));
+  skulls.push(new Skull(500, 70, canvas, skullImg));
+  skulls.push(new Skull(4000, 10, canvas, skullImg));
+  skulls.push(new Skull(5000, 10, canvas, skullImg));
 
-  skulls.push(new Skull(50, 70, canvas));
-  skulls.push(new Skull(1000, 200, canvas));
-  skulls.push(new Skull(2000, 10, canvas));
-  skulls.push(new Skull(500, 70, canvas));
-  skulls.push(new Skull(4000, 10, canvas));
-  skulls.push(new Skull(5000, 10, canvas));
+  flappyDragons.push(new FlappyDragon(5000, 50, flappyDragonImg));
+  flappyDragons.push(new FlappyDragon(4500, 100, flappyDragonImg));
+  flappyDragons.push(new FlappyDragon(4000, 60, flappyDragonImg));
+  flappyDragons.push(new FlappyDragon(3500, 500, flappyDragonImg));
+  flappyDragons.push(new FlappyDragon(5000, 700, flappyDragonImg));
+  flappyDragons.push(new FlappyDragon(4000, 10, flappyDragonImg));
+  flappyDragons.push(new FlappyDragon(5000, 200, flappyDragonImg));
+  flappyDragons.push(new FlappyDragon(10000, 50, flappyDragonImg));
+  flappyDragons.push(new FlappyDragon(9000, 100, flappyDragonImg));
+  flappyDragons.push(new FlappyDragon(8000, 60, flappyDragonImg));
+  flappyDragons.push(new FlappyDragon(7000, 500, flappyDragonImg));
+  flappyDragons.push(new FlappyDragon(6000, 700, flappyDragonImg));
+  flappyDragons.push(new FlappyDragon(10000, 10, flappyDragonImg));
+  flappyDragons.push(new FlappyDragon(10000, 200, flappyDragonImg));
+  flappyDragons.push(new FlappyDragon(11000, 10, flappyDragonImg));
+  flappyDragons.push(new FlappyDragon(11000, 200, flappyDragonImg));
+  flappyDragons.push(new FlappyDragon(12000, 10, flappyDragonImg));
+  flappyDragons.push(new FlappyDragon(12000, 200, flappyDragonImg));
 
-  flappyDragons.push(new FlappyDragon(5000, 50));
-  flappyDragons.push(new FlappyDragon(4500, 100));
-  flappyDragons.push(new FlappyDragon(4000, 60));
-  flappyDragons.push(new FlappyDragon(3500, 500));
-  flappyDragons.push(new FlappyDragon(5000, 700));
-  flappyDragons.push(new FlappyDragon(4000, 10));
-  flappyDragons.push(new FlappyDragon(5000, 200));
-  flappyDragons.push(new FlappyDragon(10000, 50));
-  flappyDragons.push(new FlappyDragon(9000, 100));
-  flappyDragons.push(new FlappyDragon(8000, 60));
-  flappyDragons.push(new FlappyDragon(7000, 500));
-  flappyDragons.push(new FlappyDragon(6000, 700));
-  flappyDragons.push(new FlappyDragon(10000, 10));
-  flappyDragons.push(new FlappyDragon(10000, 200));
-  flappyDragons.push(new FlappyDragon(11000, 10));
-  flappyDragons.push(new FlappyDragon(11000, 200));
-  flappyDragons.push(new FlappyDragon(12000, 10));
-  flappyDragons.push(new FlappyDragon(12000, 200));
+  flappyGrumpys.push(new FlappyGrumpy(5000, 300, flappyGrumpyImg));
+  flappyGrumpys.push(new FlappyGrumpy(6000, 200, flappyGrumpyImg));
+  flappyGrumpys.push(new FlappyGrumpy(1000, 0, flappyGrumpyImg));
+  flappyGrumpys.push(new FlappyGrumpy(2000, 150, flappyGrumpyImg));
+  flappyGrumpys.push(new FlappyGrumpy(7000, 80, flappyGrumpyImg));
+  flappyGrumpys.push(new FlappyGrumpy(4000, 190, flappyGrumpyImg));
 
-  flappyGrumpys.push(new FlappyGrumpy(5000, 300));
-  flappyGrumpys.push(new FlappyGrumpy(6000, 200));
-  flappyGrumpys.push(new FlappyGrumpy(1000, 0));
-  flappyGrumpys.push(new FlappyGrumpy(2000, 150));
-  flappyGrumpys.push(new FlappyGrumpy(7000, 80));
-  flappyGrumpys.push(new FlappyGrumpy(4000, 190));
-
-  flappyBirds.push(new FlappyBird(5250, 400, canvas));
-  flappyBirds.push(new FlappyBird(5250, 0, canvas));
+  flappyBirds.push(new FlappyBird(5250, 400, canvas, flappyBirdImg));
+  flappyBirds.push(new FlappyBird(5250, 0, canvas, flappyBirdImg));
 
 }
 init();
@@ -273,7 +375,7 @@ function update(elapsedTime) {
       console.log("Flappy monster: (" + monster.position.x
         + "," + monster.position.y + ")");
       player.state = "hit";
-      player.frame = "frame-1";
+      player.frame = "frame-10";
       player.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
     }
     // if(checkCollision(bullets, monster))
@@ -292,8 +394,9 @@ function update(elapsedTime) {
       skull.img.src = 'assets/enemies/skull/hit/frame.png';
       console.log("Skull collision!");
       player.state = "hit";
-      player.frame = "frame-1";
+      player.frame = "frame-10";
       player.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
+      //player.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
     }
     // if(checkCollision(bullets, dragon))
     // {
@@ -309,7 +412,7 @@ function update(elapsedTime) {
     if(checkCollision(player, dragon))
     {
       player.state = "hit";
-      player.frame = "frame-1";
+      player.frame = "frame-10";
       player.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
       console.log("Dragon collision! ROAR");
     }
@@ -325,8 +428,8 @@ function update(elapsedTime) {
     if(checkCollision(player, grumpy))
     {
       player.state = "hit";
-      player.frame = "frame-1";
-      player.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
+      player.frame = "frame-10";
+      //player.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
       console.log("Grumpy collision! That should make you grumpy.");
     }
     // if(checkCollision(bullets, grumpy))
@@ -341,11 +444,11 @@ function update(elapsedTime) {
     if(checkCollision(player, bird))
     {
       player.state = "hit";
-      player.frame = "frame-1";
+      player.frame = "frame-10";
       player.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
       bird.state = "hit";
-      bird.frame = "frame-1";
-      bird.img.src = 'assets/enemies/flappy-bird/hit/frame-1.png';
+      bird.frame = "frame-5";
+      bird.img.src = 'assets/enemies/flappy-bird/hit/frame-2.png';
       console.log("Bird collision! That bird flew the coop!");
     }
     // if(checkCollision(bullets, bird))
@@ -782,22 +885,23 @@ module.exports = exports = FlappyBird;
  * @param {xPos} the x position
  * @param {yPos} the y position
  */
-function FlappyBird(xPos, yPos, canvas) {
+function FlappyBird(xPos, yPos, canvas, img) {
   this.worldWidth = canvas.width;
   this.worldHeight = canvas.height;
   this.angle = 0;
   this.position = {x: xPos, y: yPos};
   this.velocity = {x: 0, y: 0};
-  this.img = new Image();
+  //this.img = new Image();
   this.frame = "frame-1";
   // http://opengameart.org/content/flappy-monster-sprite-sheets (public domain)
-  this.img.src = 'assets/enemies/flappy-bird/flying/frame-1.png';
+  //this.img.src = 'assets/enemies/flappy-bird/flying/frame-1.png';
   this.timer = 0;
   this.state = "flying";
   this.height = 128 * 3;
   this.width = 128 * 3;
   this.initialAcceleration = true; 
   this.active = true;
+  this.img = img[0];
 
   var self = this;
   self.animate = function(time)
@@ -812,19 +916,23 @@ function FlappyBird(xPos, yPos, canvas) {
         {
           case 'frame-1':
             self.frame = 'frame-2';
-            self.img.src = 'assets/enemies/flappy-bird/flying/frame-2.png';
+            //self.img.src = 'assets/enemies/flappy-bird/flying/frame-2.png';
+            self.img = img[1];
             break;
           case 'frame-2':
             self.frame = 'frame-3';
-            self.img.src = 'assets/enemies/flappy-bird/flying/frame-3.png';
+            //self.img.src = 'assets/enemies/flappy-bird/flying/frame-3.png';
+            self.img = img[2];
             break;
           case 'frame-3':
             self.frame = 'frame-4';
-            self.img.src = 'assets/enemies/flappy-bird/flying/frame-4.png';
+            //self.img.src = 'assets/enemies/flappy-bird/flying/frame-4.png';
+            self.img = img[3];
             break;
           case 'frame-4':
             self.frame = 'frame-1';
-            self.img.src = 'assets/enemies/flappy-bird/flying/frame-1.png';
+            //self.img.src = 'assets/enemies/flappy-bird/flying/frame-1.png';
+            self.img = img[0];
             break;
         }
       }
@@ -832,13 +940,15 @@ function FlappyBird(xPos, yPos, canvas) {
       {
         switch(self.frame)
         {
-          case 'frame-1':
-            self.frame = 'frame-2';
-            self.img.src = 'assets/enemies/flappy-bird/hit/frame-2.png';
+          case 'frame-5':
+            self.frame = 'frame-6';
+            //self.img.src = 'assets/enemies/flappy-bird/hit/frame-2.png';
+            self.img = img[5];
             break;
-          case 'frame-2':
-            self.frame = 'frame-1';
-            self.img.src = 'assets/enemies/flappy-bird/hit/frame-1.png';
+          case 'frame-6':
+            self.frame = 'frame-5';
+            //self.img.src = 'assets/enemies/flappy-bird/hit/frame-1.png';
+            self.img = img[4];
             break;
         }
       }
@@ -912,14 +1022,13 @@ module.exports = exports = FlappyDragon;
  * @param {xPos} the x position
  * @param {yPos} the y position
  */
-function FlappyDragon(xPos, yPos) {
+function FlappyDragon(xPos, yPos, img) {
   this.angle = 0;
   this.position = {x: xPos, y: yPos};
   this.velocity = {x: 0, y: 0};
-  this.img = new Image();
+  this.img = img[0];
   this.frame = "frame-1";
   // http://opengameart.org/content/flappy-monster-sprite-sheets (public domain)
-  this.img.src = 'assets/enemies/flappy-dragon/frame-1.png';
   this.timer = 0;
   this.height = 64;
   this.width = 64;
@@ -936,19 +1045,19 @@ function FlappyDragon(xPos, yPos) {
       {
         case 'frame-1':
           self.frame = 'frame-2';
-          self.img.src = 'assets/enemies/flappy-dragon/frame-2.png';
+          self.img = img[1];
           break;
         case 'frame-2':
           self.frame = 'frame-3';
-          self.img.src = 'assets/enemies/flappy-dragon/frame-3.png';
+          self.img = img[2];
           break;
         case 'frame-3':
           self.frame = 'frame-4';
-          self.img.src = 'assets/enemies/flappy-dragon/frame-4.png';
+          self.img = img[3];
           break;
         case 'frame-4':
           self.frame = 'frame-1';
-          self.img.src = 'assets/enemies/flappy-dragon/frame-1.png';
+          self.img = img[0];
           break;
       }
     }
@@ -1021,14 +1130,13 @@ module.exports = exports = FlappyGrumpy;
  * @param {xPos} the x position
  * @param {yPos} the y position
  */
-function FlappyGrumpy(xPos, yPos) {
+function FlappyGrumpy(xPos, yPos, img) {
   this.angle = 0;
   this.position = {x: xPos, y: yPos};
   this.velocity = {x: 0, y: 0};
-  this.img = new Image();
+  this.img =  img[0];
   this.frame = "frame-1";
   // http://opengameart.org/content/flappy-monster-sprite-sheets (public domain)
-  this.img.src = 'assets/enemies/flappy-grumpy/frame-1.png';
   this.timer = 0;
   this.height = 64;
   this.width = 64;
@@ -1045,35 +1153,35 @@ function FlappyGrumpy(xPos, yPos) {
       {
         case 'frame-1':
           self.frame = 'frame-2';
-          self.img.src = 'assets/enemies/flappy-grumpy/frame-2.png';
+          self.img = img[1];
           break;
         case 'frame-2':
           self.frame = 'frame-3';
-          self.img.src = 'assets/enemies/flappy-grumpy/frame-3.png';
+          self.img = img[2];
           break;
         case 'frame-3':
           self.frame = 'frame-4';
-          self.img.src = 'assets/enemies/flappy-grumpy/frame-4.png';
+          self.img = img[3];
           break;
         case 'frame-4':
           self.frame = 'frame-5';
-          self.img.src = 'assets/enemies/flappy-grumpy/frame-5.png';
+          self.img = img[4];
           break;
         case 'frame-5':
           self.frame = 'frame-6';
-          self.img.src = 'assets/enemies/flappy-grumpy/frame-6.png';
+          self.img = img[5];
           break;
         case 'frame-6':
           self.frame = 'frame-7';
-          self.img.src = 'assets/enemies/flappy-grumpy/frame-7.png';
+          self.img = img[6];
           break;
         case 'frame-7':
           self.frame = 'frame-8';
-          self.img.src = 'assets/enemies/flappy-grumpy/frame-8.png';
+          self.img = img[7];
           break;
         case 'frame-8':
           self.frame = 'frame-1';
-          self.img.src = 'assets/enemies/flappy-grumpy/frame-1.png';
+          self.img = img[0];
           break;
       }
     }
@@ -1146,14 +1254,13 @@ module.exports = exports = FlappyMonster;
  * @param {xPos} the x position
  * @param {yPos} the y position
  */
-function FlappyMonster(xPos, yPos) {
+function FlappyMonster(xPos, yPos, img) {
   this.angle = 0;
   this.position = {x: xPos, y: yPos};
   this.velocity = {x: 0, y: 0};
-  this.img = new Image();
   this.frame = "frame-1";
   // http://opengameart.org/content/flappy-monster-sprite-sheets (public domain)
-  this.img.src = 'assets/enemies/flappy-monster/frame-1.png';
+  this.img = img[0];
   this.timer = 0;
   this.height = 64;
   this.width = 64;
@@ -1170,35 +1277,35 @@ function FlappyMonster(xPos, yPos) {
       {
         case 'frame-1':
           self.frame = 'frame-2';
-          self.img.src = 'assets/enemies/flappy-monster/frame-2.png';
+          self.img = img[1];
           break;
         case 'frame-2':
           self.frame = 'frame-3';
-          self.img.src = 'assets/enemies/flappy-monster/frame-3.png';
+          self.img = img[2];
           break;
         case 'frame-3':
           self.frame = 'frame-4';
-          self.img.src = 'assets/enemies/flappy-monster/frame-4.png';
+          self.img = img[3];
           break;
         case 'frame-4':
           self.frame = 'frame-5';
-          self.img.src = 'assets/enemies/flappy-monster/frame-5.png';
+          self.img = img[4];
           break;
         case 'frame-5':
           self.frame = 'frame-6';
-          self.img.src = 'assets/enemies/flappy-monster/frame-6.png';
+          self.img = img[5];
           break;
         case 'frame-6':
           self.frame = 'frame-7';
-          self.img.src = 'assets/enemies/flappy-monster/frame-7.png';
+          self.img = img[6];
           break;
         case 'frame-7':
           self.frame = 'frame-8';
-          self.img.src = 'assets/enemies/flappy-monster/frame-8.png';
+          self.img = img[7];
           break;
         case 'frame-8':
           self.frame = 'frame-1';
-          self.img.src = 'assets/enemies/flappy-monster/frame-1.png';
+          self.img = img[0];
           break;
       }
     }
@@ -1318,14 +1425,14 @@ const PLAYER_SPEED = 5;
 const BULLET_SPEED = 10;
 const MS_PER_FRAME = 1000/8;
 
-var img1 = 'assets/enemies/flappy-cat/flying/frame-1.png';
-var img2 = 'assets/enemies/flappy-cat/flying/frame-2.png';
-var img3 = 'assets/enemies/flappy-cat/flying/frame-3.png';
-var img4 = 'assets/enemies/flappy-cat/flying/frame-4.png';
-var img5 = 'assets/enemies/flappy-cat/flying/frame-5.png';
-var img6 = 'assets/enemies/flappy-cat/flying/frame-6.png';
-var img7 = 'assets/enemies/flappy-cat/flying/frame-7.png';
-var img8 = 'assets/enemies/flappy-cat/flying/frame-8.png';
+// var img1 = 'assets/enemies/flappy-cat/flying/frame-1.png';
+// var img2 = 'assets/enemies/flappy-cat/flying/frame-2.png';
+// var img3 = 'assets/enemies/flappy-cat/flying/frame-3.png';
+// var img4 = 'assets/enemies/flappy-cat/flying/frame-4.png';
+// var img5 = 'assets/enemies/flappy-cat/flying/frame-5.png';
+// var img6 = 'assets/enemies/flappy-cat/flying/frame-6.png';
+// var img7 = 'assets/enemies/flappy-cat/flying/frame-7.png';
+// var img8 = 'assets/enemies/flappy-cat/flying/frame-8.png';
 
 /**
  * @module Player
@@ -1338,21 +1445,22 @@ module.exports = exports = Player;
  * Creates a player
  * @param {BulletPool} bullets the bullet pool
  */
-function Player(bullets, missiles, weapon) {
+function Player(bullets, missiles, weapon, img) {
   this.missiles = missiles;
   this.missileCount = 4;
   this.bullets = bullets;
   this.angle = 0;
   this.position = {x: 200, y: 200};
   this.velocity = {x: 0, y: 0};
-  this.img = new Image()
-  this.img.src = 'assets/player/flappy-cat/flying/frame-1.png';
+  //this.img = new Image()
+  //this.img.src = 'assets/player/flappy-cat/flying/frame-1.png';
   this.width = 64 + (64 * .5);
   this.height = 64 + (64 * .5);
   this.state = "flying";
   this.timer = 0;
   this.frame = 'frame-1';
   this.weapon = weapon;
+  this.img = img[0];
 
   var self = this;
   self.animate = function(time)
@@ -1367,35 +1475,35 @@ function Player(bullets, missiles, weapon) {
         {
           case 'frame-1':
             self.frame = 'frame-2';
-            self.img.src = img1;
+            self.img = img[0];
             break;
           case 'frame-2':
             self.frame = 'frame-3';
-            self.img.src = img2;
+            self.img = img[1];
             break;
           case 'frame-3':
             self.frame = 'frame-4';
-            self.img.src = img3;
+            self.img = img[2];
             break;
           case 'frame-4':
             self.frame = 'frame-5';
-            self.img.src = img4;
+            self.img = img[3];
             break;
           case 'frame-5':
             self.frame = 'frame-6';
-            self.img.src = img5;
+            self.img = img[4];
             break;
           case 'frame-6':
             self.frame = 'frame-7';
-            self.img.src = img6;
+            self.img = img[5];
             break;
           case 'frame-7':
             self.frame = 'frame-8';
-            self.img.src = img7;
+            self.img = img[6];
             break;
           case 'frame-8':
             self.frame = 'frame-1';
-            self.img.src = img8;
+            self.img = img[7];
             break;
         }
       }
@@ -1403,13 +1511,13 @@ function Player(bullets, missiles, weapon) {
       {
         switch(self.frame)
         {
-          case 'frame-1':
-            self.frame = 'frame-2';
-            self.img.src = 'assets/enemies/flappy-cat/hit/frame-2.png';
+          case 'frame-9':
+            self.frame = 'frame-10';
+            self.img = img[8];
             break;
-          case 'frame-2':
-            self.frame = 'frame-1';
-            self.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
+          case 'frame-10':
+            self.frame = 'frame-9';
+            self.img = img[9];
             break;
         }
       }
@@ -1610,16 +1718,15 @@ module.exports = exports = Skull;
  * @param {xPos} the x position
  * @param {yPos} the y position
  */
-function Skull(xPos, yPos, canvas) {
+function Skull(xPos, yPos, canvas, img) {
   this.worldWidth = canvas.width;
   this.worldHeight = canvas.height;
   this.angle = 0;
   this.position = {x: xPos, y: yPos};
   this.velocity = {x: 0, y: 0};
-  this.img = new Image();
+  this.img = img[0];
   this.frame = "frame-1";
   // http://opengameart.org/content/flappy-monster-sprite-sheets (public domain)
-  this.img.src = 'assets/enemies/skull/idle/frame-1.png';
   this.timer = 0;
   this.state = "idle";
   this.height = 64;
@@ -1640,18 +1747,18 @@ function Skull(xPos, yPos, canvas) {
         {
           case 'frame-1':
             self.frame = 'frame-2';
-            self.img.src = 'assets/enemies/skull/idle/frame-2.png';
+            self.img = img[1];
             break;
           case 'frame-2':
             self.frame = 'frame-1';
-            self.img.src = 'assets/enemies/skull/idle/frame-1.png';
+            self.img = img[0];
             break;
         }
       }
       else
       {
         self.frame = 'frame-3';
-        self.img.src = 'assets/enemies/skull/hit/frame.png';
+        self.img = img[2];
       }
     }  
   }
