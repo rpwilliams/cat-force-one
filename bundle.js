@@ -70,7 +70,7 @@ window.onmousedown = function(event) {
   reticule.x = event.offsetX;
   reticule.y = event.offsetY;
   // TODO: Fire bullet in direction of the retciule
-  bullets.add(player.position, {x:1, y:0});
+  bullets.add(player.position, {x:10, y:0});
   player.fireBullet(reticule);
 }
 
@@ -332,7 +332,7 @@ function update(elapsedTime) {
 
   // Update bullets
   bullets.update(elapsedTime, function(bullet){
-    if(!camera.onScreen(bullet)) return true;
+    //if(!camera.onScreen(bullet)) return true;
     return false;
   });
 
@@ -770,7 +770,7 @@ BulletPool.prototype.render = function(elapsedTime, ctx) {
   // Render the bullets as a single path
   ctx.save();
   ctx.beginPath();
-  ctx.fillStyle = "black";
+  ctx.fillStyle = "white";
   for(var i = 0; i < this.end; i++) {
     ctx.moveTo(this.pool[4*i], this.pool[4*i+1]);
     ctx.arc(this.pool[4*i], this.pool[4*i+1], 2, 0, 2*Math.PI);

@@ -69,7 +69,7 @@ window.onmousedown = function(event) {
   reticule.x = event.offsetX;
   reticule.y = event.offsetY;
   // TODO: Fire bullet in direction of the retciule
-  bullets.add(player.position, {x:1, y:0});
+  bullets.add(player.position, {x:10, y:0});
   player.fireBullet(reticule);
 }
 
@@ -331,7 +331,7 @@ function update(elapsedTime) {
 
   // Update bullets
   bullets.update(elapsedTime, function(bullet){
-    if(!camera.onScreen(bullet)) return true;
+    //if(!camera.onScreen(bullet)) return true;
     return false;
   });
 
@@ -577,6 +577,7 @@ function render(elapsedTime, ctx) {
   ctx.translate(-camera.position.x, 0);
   ctx.drawImage(backgrounds[0], 5000, 0, canvas.width, canvas.height);
   ctx.restore();
+
 
   // Transform the coordinate system using
   // the camera position BEFORE rendering
