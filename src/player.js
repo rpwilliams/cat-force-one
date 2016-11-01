@@ -209,6 +209,7 @@ Player.prototype.fireBullet = function(direction) {
   var position = Vector.add(this.position, {x:30, y:30});
   var velocity = Vector.scale(Vector.normalize(direction), BULLET_SPEED);
   this.bullets.add(position, velocity);
+  console.log("Bullet fired at (" + direction.x + ", " + direction.y + ")");
 }
 
 /**

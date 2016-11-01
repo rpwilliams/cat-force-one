@@ -65,6 +65,7 @@ window.onmousedown = function(event) {
   reticule.y = event.offsetY;
   // TODO: Fire bullet in direction of the retciule
   bullets.add(player.position, {x:1, y:0});
+  player.fireBullet(reticule);
 }
 
 /**
@@ -275,6 +276,10 @@ function update(elapsedTime) {
       player.frame = "frame-1";
       player.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
     }
+    // if(checkCollision(bullets, monster))
+    // {
+    //   console.log("Bullet collision!");
+    // }
   });
 
   // Update the flappy cats
@@ -290,6 +295,12 @@ function update(elapsedTime) {
       player.frame = "frame-1";
       player.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
     }
+    // if(checkCollision(bullets, dragon))
+    // {
+    //   skull.state = "hit";
+    //   skull.img.src = 'assets/enemies/skull/hit/frame.png';
+    //   console.log("Bullet collision!");
+    // }
   });
 
   // Update the flappy dragons
@@ -302,6 +313,10 @@ function update(elapsedTime) {
       player.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
       console.log("Dragon collision! ROAR");
     }
+    // if(checkCollision(bullets, dragon))
+    // {
+    //   console.log("Bullet collision!");
+    // }
   });
 
   // Update the flappy grumpys
@@ -314,6 +329,10 @@ function update(elapsedTime) {
       player.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
       console.log("Grumpy collision! That should make you grumpy.");
     }
+    // if(checkCollision(bullets, grumpy))
+    // {
+    //   console.log("Bullet collision!");
+    // }
   });
 
   // Update the flappy grumpys
@@ -329,6 +348,10 @@ function update(elapsedTime) {
       bird.img.src = 'assets/enemies/flappy-bird/hit/frame-1.png';
       console.log("Bird collision! That bird flew the coop!");
     }
+    // if(checkCollision(bullets, bird))
+    // {
+    //   console.log("Bullet collision!");
+    // }
   });
 
   /* Remove unwanted enemies and powerups */
@@ -1495,6 +1518,7 @@ Player.prototype.fireBullet = function(direction) {
   var position = Vector.add(this.position, {x:30, y:30});
   var velocity = Vector.scale(Vector.normalize(direction), BULLET_SPEED);
   this.bullets.add(position, velocity);
+  console.log("Bullet fired at (" + direction.x + ", " + direction.y + ")");
 }
 
 /**
