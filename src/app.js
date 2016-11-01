@@ -11,6 +11,7 @@ const Skull = require('./skull');
 const FlappyDragon = require('./flappy-dragon');
 const FlappyGrumpy = require('./flappy-grumpy');
 const FlappyBird = require('./flappy-bird');
+const Powerup = require('./powerup');
 
 /* Global variables */
 var canvas = document.getElementById('screen');
@@ -26,7 +27,7 @@ var input = {
 var camera = new Camera(canvas);
 var bullets = new BulletPool(10);
 var missiles = [];
-var player = new Player(bullets, missiles, "weapon-2");
+var player = new Player(bullets, missiles, "weapon-1");
 var backgrounds = [
   new Image(),
   new Image(),
@@ -37,12 +38,7 @@ var skulls = [];
 var flappyDragons = [];
 var flappyGrumpys = [];
 var flappyBirds = [];
-
-// http://opengameart.org/content/ruined-city-background (public domain)
-backgrounds[0].src = 'assets/city-foreground.png';
-backgrounds[1].src = 'assets/city-background.png';
-backgrounds[2].src = 'assets/city-sky.png';
-
+var powerUps = [];
 
 /**
  * @function onkeydown
@@ -102,8 +98,24 @@ window.onkeyup = function(event) {
   }
 }
 
+/**
+ * @function init
+ * Initializes the game
+ */
 function init()
 {
+  // http://opengameart.org/content/ruined-city-background (public domain)
+  backgrounds[0].src = 'assets/city-foreground.png';
+  backgrounds[1].src = 'assets/city-background.png';
+  backgrounds[2].src = 'assets/city-sky.png';
+
+  powerUps.push(new Powerup(50,50));
+  powerUps.push(new Powerup(1000,50));
+  powerUps.push(new Powerup(2000,50));
+  powerUps.push(new Powerup(3000,50));
+  powerUps.push(new Powerup(4000,50));
+
+
   flappyMonsters.push(new FlappyMonster(0, 0));
   flappyMonsters.push(new FlappyMonster(500, 20));
   flappyMonsters.push(new FlappyMonster(1000, 80));
@@ -161,7 +173,6 @@ var masterLoop = function(timestamp) {
 }
 masterLoop(performance.now());
 
-
 /**
  * @function update
  * Updates the game state, moving
@@ -182,6 +193,35 @@ function update(elapsedTime) {
   bullets.update(elapsedTime, function(bullet){
     if(!camera.onScreen(bullet)) return true;
     return false;
+  });
+
+  // Update the power up
+  powerUps.forEach(function(power){
+    power.update(elapsedTime);
+    if(checkCollision(player, power))
+    {
+      const MAX = 4;  // There are 4 possible weapons 
+      const MIN = 1;
+      var randomNumber = Math.floor(Math.random() * MAX) + MIN
+      console.log("Power up: " + randomNumber);
+      power.active = false;
+
+      switch(randomNumber)
+      {
+        case 1:
+          player.weapon = "weapon-1";
+          break;
+        case 2:
+          player.weapon = "weapon-2";
+          break;
+        case 3:
+          player.weapon = "weapon-3";
+          break;
+        case 4:
+          player.weapon = "weapon-4";
+          break;
+      }
+    }
   });
 
   // Update the flappy monsters
@@ -253,11 +293,13 @@ function update(elapsedTime) {
     }
   });
 
-
-  //console.log("Player: " + "(" + player.position.x + "," + player.position.y + ")");
-
-  //console.log("Flappy monster: (" + flappyMonsters[1].position.x
-  //   + "," + flappyMonsters[1].position.y + ")");
+  /* Remove unwanted enemies and powerups */
+  flappyMonsters = flappyMonsters.filter(function(monster){ return monster.active; });
+  skulls = skulls.filter(function(skull){ return skull.active; });
+  flappyDragons = flappyDragons.filter(function(dragon){ return dragon.active; });
+  flappyGrumpys = flappyGrumpys.filter(function(grumpy){ return grumpy.active; });
+  flappyBirds = flappyBirds.filter(function(bird){ return bird.active; });
+  powerUps = powerUps.filter(function(powerup){ return powerup.active; });
 
   // Update missiles
   // var markedForRemoval = [];
@@ -408,9 +450,13 @@ function renderWorld(elapsedTime, ctx, camera) {
     // Render the player
     player.render(elapsedTime, ctx, camera);
 
+    // Render the power up
+    powerUps.forEach(function(powerup){
+      powerup.render(elapsedTime, ctx);
+    });
+
     // Render the flappy monsters
     flappyMonsters.forEach(function(FlappyMonster){
-      FlappyMonster.onload
       FlappyMonster.render(elapsedTime, ctx);
     });
 

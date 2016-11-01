@@ -35,6 +35,7 @@ function Skull(xPos, yPos, canvas) {
   this.height = 64;
   this.width = 64;
   this.initialAcceleration = true; 
+  this.active = true;
 
   var self = this;
   self.animate = function(time)
@@ -76,7 +77,8 @@ Skull.prototype.update = function(elapsedTime) {
   // move the player
   //this.velocity.x += PLAYER_SPEED;
   this.position.x += PLAYER_SPEED;
-
+  this.active = this.active;
+  
   // don't let the player move off-screen
   //if(this.position.x < 0) this.position.x = 0;
   //if(this.position.x > 1024) this.position.x = 1024;

@@ -121,14 +121,16 @@ Player.prototype.update = function(elapsedTime, input) {
     self.animate(elapsedTime);
   }, 1000
   );
+
+  //this.weapon = this.weapon;
   
   // set the velocity
   this.velocity.x = 0;
   if(input.left) this.velocity.x -= PLAYER_SPEED;
   if(input.right) this.velocity.x += PLAYER_SPEED;
   this.velocity.y = 0;
-  if(input.up) this.velocity.y -= PLAYER_SPEED / 2;
-  if(input.down) this.velocity.y += PLAYER_SPEED / 2;
+  if(input.up) this.velocity.y -= PLAYER_SPEED;
+  if(input.down) this.velocity.y += PLAYER_SPEED;
 
   // determine player angle
   this.angle = 0;
@@ -159,9 +161,9 @@ Player.prototype.render = function(elapasedTime, ctx, camera) {
   ctx.drawImage(this.img, 0, 0, this.width, this.height);
   ctx.restore();
 
+  var img = new Image();
   if(this.weapon === "weapon-1")
   {
-    var img = new Image();
     img.src = 'assets/weapons/Turret01.png';
     ctx.save();
     ctx.translate(this.position.x, this.position.y);
@@ -171,7 +173,6 @@ Player.prototype.render = function(elapasedTime, ctx, camera) {
   }
   else if(this.weapon === "weapon-2")
   {
-    var img = new Image();
     img.src = 'assets/weapons/Turret04.png';
     ctx.save();
     ctx.translate(this.position.x, this.position.y);
@@ -181,7 +182,6 @@ Player.prototype.render = function(elapasedTime, ctx, camera) {
   }
   else if(this.weapon === "weapon-3")
   {
-    var img = new Image();
     img.src = 'assets/weapons/Turret06.png';
     ctx.save();
     ctx.translate(this.position.x, this.position.y);
@@ -191,7 +191,6 @@ Player.prototype.render = function(elapasedTime, ctx, camera) {
   }
   else if(this.weapon === "weapon-4")
   {
-    var img = new Image();
     img.src = 'assets/weapons/Turret02.png';
     ctx.save();
     ctx.translate(this.position.x, this.position.y);
@@ -200,7 +199,6 @@ Player.prototype.render = function(elapasedTime, ctx, camera) {
     ctx.restore();
   }
 }
-
 
 /**
  * @function fireBullet

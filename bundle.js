@@ -12,6 +12,7 @@ const Skull = require('./skull');
 const FlappyDragon = require('./flappy-dragon');
 const FlappyGrumpy = require('./flappy-grumpy');
 const FlappyBird = require('./flappy-bird');
+const Powerup = require('./powerup');
 
 /* Global variables */
 var canvas = document.getElementById('screen');
@@ -27,7 +28,7 @@ var input = {
 var camera = new Camera(canvas);
 var bullets = new BulletPool(10);
 var missiles = [];
-var player = new Player(bullets, missiles, "weapon-2");
+var player = new Player(bullets, missiles, "weapon-1");
 var backgrounds = [
   new Image(),
   new Image(),
@@ -38,12 +39,7 @@ var skulls = [];
 var flappyDragons = [];
 var flappyGrumpys = [];
 var flappyBirds = [];
-
-// http://opengameart.org/content/ruined-city-background (public domain)
-backgrounds[0].src = 'assets/city-foreground.png';
-backgrounds[1].src = 'assets/city-background.png';
-backgrounds[2].src = 'assets/city-sky.png';
-
+var powerUps = [];
 
 /**
  * @function onkeydown
@@ -105,6 +101,18 @@ window.onkeyup = function(event) {
 
 function init()
 {
+  // http://opengameart.org/content/ruined-city-background (public domain)
+  backgrounds[0].src = 'assets/city-foreground.png';
+  backgrounds[1].src = 'assets/city-background.png';
+  backgrounds[2].src = 'assets/city-sky.png';
+
+  powerUps.push(new Powerup(50,50));
+  powerUps.push(new Powerup(1000,50));
+  powerUps.push(new Powerup(2000,50));
+  powerUps.push(new Powerup(3000,50));
+  powerUps.push(new Powerup(4000,50));
+
+
   flappyMonsters.push(new FlappyMonster(0, 0));
   flappyMonsters.push(new FlappyMonster(500, 20));
   flappyMonsters.push(new FlappyMonster(1000, 80));
@@ -185,6 +193,35 @@ function update(elapsedTime) {
     return false;
   });
 
+  // Update the power up
+  powerUps.forEach(function(power){
+    power.update(elapsedTime);
+    if(checkCollision(player, power))
+    {
+      const MAX = 4;  // There are 4 possible weapons 
+      const MIN = 1;
+      var randomNumber = Math.floor(Math.random() * MAX) + MIN
+      console.log("Power up: " + randomNumber);
+      power.active = false;
+
+      switch(randomNumber)
+      {
+        case 1:
+          player.weapon = "weapon-1";
+          break;
+        case 2:
+          player.weapon = "weapon-2";
+          break;
+        case 3:
+          player.weapon = "weapon-3";
+          break;
+        case 4:
+          player.weapon = "weapon-4";
+          break;
+      }
+    }
+  });
+
   // Update the flappy monsters
   flappyMonsters.forEach(function(monster){
     monster.update(elapsedTime);
@@ -254,11 +291,13 @@ function update(elapsedTime) {
     }
   });
 
-
-  //console.log("Player: " + "(" + player.position.x + "," + player.position.y + ")");
-
-  //console.log("Flappy monster: (" + flappyMonsters[1].position.x
-  //   + "," + flappyMonsters[1].position.y + ")");
+  /* Remove unwanted enemies and powerups */
+  flappyMonsters = flappyMonsters.filter(function(monster){ return monster.active; });
+  skulls = skulls.filter(function(skull){ return skull.active; });
+  flappyDragons = flappyDragons.filter(function(dragon){ return dragon.active; });
+  flappyGrumpys = flappyGrumpys.filter(function(grumpy){ return grumpy.active; });
+  flappyBirds = flappyBirds.filter(function(bird){ return bird.active; });
+  powerUps = powerUps.filter(function(powerup){ return powerup.active; });
 
   // Update missiles
   // var markedForRemoval = [];
@@ -409,9 +448,13 @@ function renderWorld(elapsedTime, ctx, camera) {
     // Render the player
     player.render(elapsedTime, ctx, camera);
 
+    // Render the power up
+    powerUps.forEach(function(powerup){
+      powerup.render(elapsedTime, ctx);
+    });
+
     // Render the flappy monsters
     flappyMonsters.forEach(function(FlappyMonster){
-      FlappyMonster.onload
       FlappyMonster.render(elapsedTime, ctx);
     });
 
@@ -460,7 +503,7 @@ function checkCollision(a, b)
     a.position.y < b.position.y + b.height &&
     a.position.y + a.height > b.position.y;
 }
-},{"./bullet_pool":2,"./camera":3,"./flappy-bird":4,"./flappy-dragon":5,"./flappy-grumpy":6,"./flappy-monster":7,"./game":8,"./player":9,"./skull":10,"./vector":11}],2:[function(require,module,exports){
+},{"./bullet_pool":2,"./camera":3,"./flappy-bird":4,"./flappy-dragon":5,"./flappy-grumpy":6,"./flappy-monster":7,"./game":8,"./player":9,"./powerup":10,"./skull":11,"./vector":12}],2:[function(require,module,exports){
 "use strict";
 
 /**
@@ -642,7 +685,7 @@ Camera.prototype.toWorldCoordinates = function(screenCoordinates) {
   return Vector.add(screenCoordinates, this);
 }
 
-},{"./vector":11}],4:[function(require,module,exports){
+},{"./vector":12}],4:[function(require,module,exports){
 "use strict";
 
 /* Classes and Libraries */
@@ -680,6 +723,7 @@ function FlappyBird(xPos, yPos, canvas) {
   this.height = 128 * 3;
   this.width = 128 * 3;
   this.initialAcceleration = true; 
+  this.active = true;
 
   var self = this;
   self.animate = function(time)
@@ -738,6 +782,7 @@ FlappyBird.prototype.update = function(elapsedTime) {
   // move the player
   this.velocity.x += PLAYER_SPEED;
   this.position.x += PLAYER_SPEED;
+  this.active = this.active;
 
   // don't let the player move off-screen
   //if(this.position.x < 0) this.position.x = 0;
@@ -770,7 +815,7 @@ FlappyBird.prototype.render = function(elapsedTime, ctx) {
 
 
 
-},{"./vector":11}],5:[function(require,module,exports){
+},{"./vector":12}],5:[function(require,module,exports){
 "use strict";
 
 /* Classes and Libraries */
@@ -804,6 +849,7 @@ function FlappyDragon(xPos, yPos) {
   this.timer = 0;
   this.height = 64;
   this.width = 64;
+  this.active = true;
 
   var self = this;
   self.animate = function(time)
@@ -844,6 +890,7 @@ FlappyDragon.prototype.update = function(elapsedTime) {
   // move the player
   this.velocity.x += PLAYER_SPEED;
   this.position.x += PLAYER_SPEED;
+  this.active = this.active;
 
   // don't let the player move off-screen
   //if(this.position.x < 0) this.position.x = 0;
@@ -877,7 +924,7 @@ FlappyDragon.prototype.render = function(elapsedTime, ctx) {
 
 
 
-},{"./vector":11}],6:[function(require,module,exports){
+},{"./vector":12}],6:[function(require,module,exports){
 "use strict";
 
 /* Classes and Libraries */
@@ -911,6 +958,7 @@ function FlappyGrumpy(xPos, yPos) {
   this.timer = 0;
   this.height = 64;
   this.width = 64;
+  this.active = true;
 
   var self = this;
   self.animate = function(time)
@@ -967,7 +1015,8 @@ FlappyGrumpy.prototype.update = function(elapsedTime) {
   // move the player
   this.velocity.x += PLAYER_SPEED;
   this.position.x += PLAYER_SPEED;
-
+  this.active = this.active;
+  
   // don't let the player move off-screen
   //if(this.position.x < 0) this.position.x = 0;
   //if(this.position.x > 1024) this.position.x = 1024;
@@ -1000,7 +1049,7 @@ FlappyGrumpy.prototype.render = function(elapsedTime, ctx) {
 
 
 
-},{"./vector":11}],7:[function(require,module,exports){
+},{"./vector":12}],7:[function(require,module,exports){
 "use strict";
 
 /* Classes and Libraries */
@@ -1034,6 +1083,7 @@ function FlappyMonster(xPos, yPos) {
   this.timer = 0;
   this.height = 64;
   this.width = 64;
+  this.active = true;
 
   var self = this;
   self.animate = function(time)
@@ -1090,6 +1140,7 @@ FlappyMonster.prototype.update = function(elapsedTime) {
   // move the player
   this.velocity.x += PLAYER_SPEED;
   this.position.x += PLAYER_SPEED;
+  this.active = this.active;
 
   // don't let the player move off-screen
   //if(this.position.x < 0) this.position.x = 0;
@@ -1123,7 +1174,7 @@ FlappyMonster.prototype.render = function(elapsedTime, ctx) {
 
 
 
-},{"./vector":11}],8:[function(require,module,exports){
+},{"./vector":12}],8:[function(require,module,exports){
 "use strict";
 
 /**
@@ -1305,14 +1356,16 @@ Player.prototype.update = function(elapsedTime, input) {
     self.animate(elapsedTime);
   }, 1000
   );
+
+  //this.weapon = this.weapon;
   
   // set the velocity
   this.velocity.x = 0;
   if(input.left) this.velocity.x -= PLAYER_SPEED;
   if(input.right) this.velocity.x += PLAYER_SPEED;
   this.velocity.y = 0;
-  if(input.up) this.velocity.y -= PLAYER_SPEED / 2;
-  if(input.down) this.velocity.y += PLAYER_SPEED / 2;
+  if(input.up) this.velocity.y -= PLAYER_SPEED;
+  if(input.down) this.velocity.y += PLAYER_SPEED;
 
   // determine player angle
   this.angle = 0;
@@ -1343,9 +1396,9 @@ Player.prototype.render = function(elapasedTime, ctx, camera) {
   ctx.drawImage(this.img, 0, 0, this.width, this.height);
   ctx.restore();
 
+  var img = new Image();
   if(this.weapon === "weapon-1")
   {
-    var img = new Image();
     img.src = 'assets/weapons/Turret01.png';
     ctx.save();
     ctx.translate(this.position.x, this.position.y);
@@ -1355,7 +1408,6 @@ Player.prototype.render = function(elapasedTime, ctx, camera) {
   }
   else if(this.weapon === "weapon-2")
   {
-    var img = new Image();
     img.src = 'assets/weapons/Turret04.png';
     ctx.save();
     ctx.translate(this.position.x, this.position.y);
@@ -1365,7 +1417,6 @@ Player.prototype.render = function(elapasedTime, ctx, camera) {
   }
   else if(this.weapon === "weapon-3")
   {
-    var img = new Image();
     img.src = 'assets/weapons/Turret06.png';
     ctx.save();
     ctx.translate(this.position.x, this.position.y);
@@ -1375,7 +1426,6 @@ Player.prototype.render = function(elapasedTime, ctx, camera) {
   }
   else if(this.weapon === "weapon-4")
   {
-    var img = new Image();
     img.src = 'assets/weapons/Turret02.png';
     ctx.save();
     ctx.translate(this.position.x, this.position.y);
@@ -1411,7 +1461,59 @@ Player.prototype.fireMissile = function() {
   }
 }
 
-},{"./vector":11}],10:[function(require,module,exports){
+},{"./vector":12}],10:[function(require,module,exports){
+"use strict";
+
+/**
+ * @module Powerup
+ * A class representing a Powerup's helicopter
+ */
+module.exports = exports = Powerup;
+
+/**
+ * @constructor Powerup
+ * Creates a Powerup
+ * @param {BulletPool} bullets the bullet pool
+ */
+function Powerup(xPos, yPos) {
+  this.position = {x: xPos, y: yPos};
+  this.velocity = {x: 0, y: 0};
+  this.img = new Image()
+  this.img.src = 'assets/weapons/powerup.png';
+  this.width = 28;
+  this.height = 28;
+  this.active = true;
+}
+
+/**
+ * @function update
+ * Updates the Powerup based on the supplied input
+ * @param {DOMHighResTimeStamp} elapedTime
+ * @param {Input} input object defining input, must have
+ * boolean properties: up, left, right, down
+ */
+Powerup.prototype.update = function(elapsedTime, input) {
+  this.active = this.active;
+}
+
+/**
+ * @function render
+ * Renders the Powerup helicopter in world coordinates
+ * @param {DOMHighResTimeStamp} elapsedTime
+ * @param {CanvasRenderingContext2D} ctx
+ */
+Powerup.prototype.render = function(elapasedTime, ctx, camera) {
+  //var offset = this.angle * 23;
+  ctx.save();
+  ctx.translate(this.position.x, this.position.y);
+  //ctx.drawImage(this.img, 48+offset, 57, 23, 27, -12.5, -12, 23, 27);
+  ctx.drawImage(this.img, 0, 0, this.width, this.height);
+  ctx.restore();
+}
+
+
+
+},{}],11:[function(require,module,exports){
 "use strict";
 
 /* Classes and Libraries */
@@ -1449,6 +1551,7 @@ function Skull(xPos, yPos, canvas) {
   this.height = 64;
   this.width = 64;
   this.initialAcceleration = true; 
+  this.active = true;
 
   var self = this;
   self.animate = function(time)
@@ -1490,7 +1593,8 @@ Skull.prototype.update = function(elapsedTime) {
   // move the player
   //this.velocity.x += PLAYER_SPEED;
   this.position.x += PLAYER_SPEED;
-
+  this.active = this.active;
+  
   // don't let the player move off-screen
   //if(this.position.x < 0) this.position.x = 0;
   //if(this.position.x > 1024) this.position.x = 1024;
@@ -1541,7 +1645,7 @@ Skull.prototype.render = function(elapsedTime, ctx) {
 
 
 
-},{"./vector":11}],11:[function(require,module,exports){
+},{"./vector":12}],12:[function(require,module,exports){
 "use strict";
 
 /**

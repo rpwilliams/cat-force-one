@@ -31,6 +31,7 @@ function FlappyMonster(xPos, yPos) {
   this.timer = 0;
   this.height = 64;
   this.width = 64;
+  this.active = true;
 
   var self = this;
   self.animate = function(time)
@@ -87,6 +88,7 @@ FlappyMonster.prototype.update = function(elapsedTime) {
   // move the player
   this.velocity.x += PLAYER_SPEED;
   this.position.x += PLAYER_SPEED;
+  this.active = this.active;
 
   // don't let the player move off-screen
   //if(this.position.x < 0) this.position.x = 0;
