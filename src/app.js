@@ -26,7 +26,7 @@ var input = {
 var camera = new Camera(canvas);
 var bullets = new BulletPool(10);
 var missiles = [];
-var player = new Player(bullets, missiles);
+var player = new Player(bullets, missiles, "weapon-2");
 var backgrounds = [
   new Image(),
   new Image(),
@@ -280,8 +280,6 @@ function update(elapsedTime) {
   * @param {CanvasRenderingContext2D} ctx the context to render to
   */
 function render(elapsedTime, ctx) {
-  //ctx.fillStyle = "black";
-  //ctx.fillRect(0, 0, 1024, 786);
 
   // TODO: Render background
   // Includes background repeats every 1000 pixels so the level lasts longer
@@ -398,6 +396,7 @@ function render(elapsedTime, ctx) {
   * @param {CanvasRenderingContext2D} ctx the context to render to
   */
 function renderWorld(elapsedTime, ctx, camera) {
+
     // Render the bullets
     bullets.render(elapsedTime, ctx);
 
@@ -411,6 +410,7 @@ function renderWorld(elapsedTime, ctx, camera) {
 
     // Render the flappy monsters
     flappyMonsters.forEach(function(FlappyMonster){
+      FlappyMonster.onload
       FlappyMonster.render(elapsedTime, ctx);
     });
 

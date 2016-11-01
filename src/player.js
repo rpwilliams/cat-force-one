@@ -9,6 +9,15 @@ const PLAYER_SPEED = 5;
 const BULLET_SPEED = 10;
 const MS_PER_FRAME = 1000/8;
 
+var img1 = 'assets/enemies/flappy-cat/flying/frame-1.png';
+var img2 = 'assets/enemies/flappy-cat/flying/frame-2.png';
+var img3 = 'assets/enemies/flappy-cat/flying/frame-3.png';
+var img4 = 'assets/enemies/flappy-cat/flying/frame-4.png';
+var img5 = 'assets/enemies/flappy-cat/flying/frame-5.png';
+var img6 = 'assets/enemies/flappy-cat/flying/frame-6.png';
+var img7 = 'assets/enemies/flappy-cat/flying/frame-7.png';
+var img8 = 'assets/enemies/flappy-cat/flying/frame-8.png';
+
 /**
  * @module Player
  * A class representing a player's helicopter
@@ -20,7 +29,7 @@ module.exports = exports = Player;
  * Creates a player
  * @param {BulletPool} bullets the bullet pool
  */
-function Player(bullets, missiles) {
+function Player(bullets, missiles, weapon) {
   this.missiles = missiles;
   this.missileCount = 4;
   this.bullets = bullets;
@@ -28,12 +37,13 @@ function Player(bullets, missiles) {
   this.position = {x: 200, y: 200};
   this.velocity = {x: 0, y: 0};
   this.img = new Image()
-  //this.img.src = 'assets/player/flappy-cat/flying/frame-1.png';
-  this.width = 64;
-  this.height = 64;
+  this.img.src = 'assets/player/flappy-cat/flying/frame-1.png';
+  this.width = 64 + (64 * .5);
+  this.height = 64 + (64 * .5);
   this.state = "flying";
   this.timer = 0;
   this.frame = 'frame-1';
+  this.weapon = weapon;
 
   var self = this;
   self.animate = function(time)
@@ -48,35 +58,35 @@ function Player(bullets, missiles) {
         {
           case 'frame-1':
             self.frame = 'frame-2';
-            self.img.src = 'assets/enemies/flappy-cat/flying/frame-1.png';
+            self.img.src = img1;
             break;
           case 'frame-2':
             self.frame = 'frame-3';
-            self.img.src = 'assets/enemies/flappy-cat/flying/frame-2.png';
+            self.img.src = img2;
             break;
           case 'frame-3':
             self.frame = 'frame-4';
-            self.img.src = 'assets/enemies/flappy-cat/flying/frame-3.png';
+            self.img.src = img3;
             break;
           case 'frame-4':
             self.frame = 'frame-5';
-            self.img.src = 'assets/enemies/flappy-cat/flying/frame-4.png';
+            self.img.src = img4;
             break;
           case 'frame-5':
             self.frame = 'frame-6';
-            self.img.src = 'assets/enemies/flappy-cat/flying/frame-5.png';
+            self.img.src = img5;
             break;
           case 'frame-6':
             self.frame = 'frame-7';
-            self.img.src = 'assets/enemies/flappy-cat/flying/frame-6.png';
+            self.img.src = img6;
             break;
           case 'frame-7':
             self.frame = 'frame-8';
-            self.img.src = 'assets/enemies/flappy-cat/flying/frame-7.png';
+            self.img.src = img7;
             break;
           case 'frame-8':
             self.frame = 'frame-1';
-            self.img.src = 'assets/enemies/flappy-cat/flying/frame-8.png';
+            self.img.src = img8;
             break;
         }
       }
@@ -106,9 +116,12 @@ function Player(bullets, missiles) {
  * boolean properties: up, left, right, down
  */
 Player.prototype.update = function(elapsedTime, input) {
-
-  this.animate(elapsedTime);
-
+  var self = this;
+  setTimeout(function() {
+    self.animate(elapsedTime);
+  }, 1000
+  );
+  
   // set the velocity
   this.velocity.x = 0;
   if(input.left) this.velocity.x -= PLAYER_SPEED;
@@ -145,7 +158,49 @@ Player.prototype.render = function(elapasedTime, ctx, camera) {
   //ctx.drawImage(this.img, 48+offset, 57, 23, 27, -12.5, -12, 23, 27);
   ctx.drawImage(this.img, 0, 0, this.width, this.height);
   ctx.restore();
+
+  if(this.weapon === "weapon-1")
+  {
+    var img = new Image();
+    img.src = 'assets/weapons/Turret01.png';
+    ctx.save();
+    ctx.translate(this.position.x, this.position.y);
+    //ctx.drawImage(this.img, 48+offset, 57, 23, 27, -12.5, -12, 23, 27);
+    ctx.drawImage(img, 0 + 15, 0 + 30, 28 * 2 - 10, 28 * 2);
+    ctx.restore();
+  }
+  else if(this.weapon === "weapon-2")
+  {
+    var img = new Image();
+    img.src = 'assets/weapons/Turret04.png';
+    ctx.save();
+    ctx.translate(this.position.x, this.position.y);
+    //ctx.drawImage(this.img, 48+offset, 57, 23, 27, -12.5, -12, 23, 27);
+    ctx.drawImage(img, 0 + 15, 0 + 30, 28 * 2 - 10, 28 * 2);
+    ctx.restore();
+  }
+  else if(this.weapon === "weapon-3")
+  {
+    var img = new Image();
+    img.src = 'assets/weapons/Turret06.png';
+    ctx.save();
+    ctx.translate(this.position.x, this.position.y);
+    //ctx.drawImage(this.img, 48+offset, 57, 23, 27, -12.5, -12, 23, 27);
+    ctx.drawImage(img, 0 + 15, 0 + 30, 28 * 1.5, 28 * 1.5);
+    ctx.restore();
+  }
+  else if(this.weapon === "weapon-4")
+  {
+    var img = new Image();
+    img.src = 'assets/weapons/Turret02.png';
+    ctx.save();
+    ctx.translate(this.position.x, this.position.y);
+    //ctx.drawImage(this.img, 48+offset, 57, 23, 27, -12.5, -12, 23, 27);
+    ctx.drawImage(img, 0 + 15, 0 + 30, 28 * 2 - 10, 28 * 2);
+    ctx.restore();
+  }
 }
+
 
 /**
  * @function fireBullet

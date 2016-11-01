@@ -11,7 +11,7 @@ The game is implemented in JavaScript using the HTML5 canvas element and the pro
 
 3. The player ship can be upgraded with better weapons providing different advantages and visual representations on-screen.  These upgrades are provided via powerups that can be picked up in game.  At least three of these implement particle effects (20 points).
 
-4. At least five unique types of enemies using different attack strategies and behaviors actively oppose the player's progress.  Colliding with an enemy or enemy projectile cause damage to the player.  Destroying an enemy causes an explosion or similar destruction implementing a particle engine (20 points).
+4. DONE: At least five unique types of enemies using different attack strategies and behaviors actively oppose the player's progress.  Colliding with an enemy or enemy projectile cause damage to the player.  Destroying an enemy causes an explosion or similar destruction implementing a particle engine (20 points).
 
 5. The player progresses through at least three levels (either by reaching the end of the level or defeating a boss), and between levels a screen summarizing they player's performance is displayed (20 points).
 

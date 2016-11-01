@@ -71,11 +71,11 @@ function FlappyBird(xPos, yPos, canvas) {
         {
           case 'frame-1':
             self.frame = 'frame-2';
-            self.img.src = 'assets/enemies/flappy-bird/got hit/frame-2.png';
+            self.img.src = 'assets/enemies/flappy-bird/hit/frame-2.png';
             break;
           case 'frame-2':
             self.frame = 'frame-1';
-            self.img.src = 'assets/enemies/flappy-bird/got hit/frame-1.png';
+            self.img.src = 'assets/enemies/flappy-bird/hit/frame-1.png';
             break;
         }
       }
@@ -99,8 +99,11 @@ FlappyBird.prototype.update = function(elapsedTime) {
   //if(this.position.x > 1024) this.position.x = 1024;
   //if(this.position.y > 786) this.position.y = 786;
 
-  // animate the monster
-  this.animate(elapsedTime);
+  var self = this;
+  setTimeout(function() {
+    self.animate(elapsedTime);
+  }, 1000
+  );
 }
 
 /**
