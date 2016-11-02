@@ -2,11 +2,11 @@
 
 /* Classes and Libraries */
 const Vector = require('./vector');
-//const Missile = require('./missile');
 
 /* Constants */
 const PLAYER_SPEED = 5;
 const BULLET_SPEED = 10;
+const MISSILE_SPEED = 5;
 const MS_PER_FRAME = 1000/8;
 
 // var img1 = 'assets/enemies/flappy-cat/flying/frame-1.png';
@@ -216,11 +216,19 @@ Player.prototype.fireBullet = function(direction) {
  * Fires a missile, if the player still has missiles
  * to fire.
  */
-Player.prototype.fireMissile = function() {
-  if(this.missileCount > 0){
-    var position = Vector.add(this.position, {x:30, y:30})
-    var missile = new Missile(position);
-    this.missiles.push(missile);
-    this.missileCount--;
-  }
+// Player.prototype.fireMissile = function() {
+//   if(this.missileCount > 0){
+//     var position = Vector.add(this.position, {x:30, y:30})
+//     //var missile = new MissilePool(position);
+//     var missile = new MissilePool(10);
+//     this.missiles.push(missile);
+//     this.missileCount--;
+//   }
+Player.prototype.fireMissile= function(direction) {
+  var position = Vector.add(this.position, {x:30, y:30});
+  var velocity = Vector.scale(Vector.normalize(direction), MISSILE_SPEED);
+  this.missiles.add(position, velocity);
+  console.log("Missile fired at (" + position.x + ", " + position.y + ")");
 }
+
+

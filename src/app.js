@@ -6,6 +6,7 @@ const Vector = require('./vector');
 const Camera = require('./camera');
 const Player = require('./player');
 const BulletPool = require('./bullet_pool');
+const MissilePool = require('./missile_pool');
 const FlappyMonster = require('./flappy-monster');
 const Skull = require('./skull');
 const FlappyDragon = require('./flappy-dragon');
@@ -26,7 +27,7 @@ var input = {
 }
 var camera = new Camera(canvas);
 var bullets = new BulletPool(10);
-var missiles = [];
+var missiles = new MissilePool(10);
 var player;
 var backgrounds = [
   new Image(),
@@ -47,6 +48,7 @@ var skullImg = [];
 var flappyDragonImg = [];
 var flappyGrumpyImg = [];
 var shoot = false;
+var missileShoot = false;
 
 /**
  * @function onkeydown
@@ -75,15 +77,32 @@ window.onkeydown = function(event) {
       event.preventDefault();
       break;
    case ' ':
-      if(!shoot)
+      if(player.weapon == "weapon-3" || player.weapon == "weapon-4")
       {
-        shoot = true;
-        console.log("Pew pew!");
-        var audio = new Audio('assets/sounds/player_shoot.wav'); // Created with http://www.bfxr.net/
-        audio.play();
-        player.fireBullet({x: 1, y: 0});
-        break;
-      }  
+        if(!shoot)
+        {
+          shoot = true;
+          console.log("Pew pew!");
+          var audio = new Audio('assets/sounds/player_shoot.wav'); // Created with http://www.bfxr.net/
+          audio.play();
+          player.fireBullet({x: 1, y: 0});
+          break;
+        }
+      }
+      else if(player.weapon == "weapon-1" || player.weapon == "weapon-2") 
+      {
+        if(!missileShoot)
+        {
+          shoot = true;
+          console.log("BOOM");
+          //var audio = new Audio('assets/sounds/player_shoot.wav'); // Created with http://www.bfxr.net/
+          //audio.play();
+          player.fireMissile({x: 1, y: 0});
+          break;
+        }
+      }
+
+        
   }
 }
 
@@ -312,6 +331,11 @@ function update(elapsedTime) {
     return false;
   });
 
+  missiles.update(elapsedTime, function(missile){
+    if(!camera.onScreen(missile)) return true;
+    return false;
+  });
+
   // Update the power up
   powerUps.forEach(function(power){
     power.update(elapsedTime);
@@ -471,7 +495,7 @@ function update(elapsedTime) {
   // var markedForRemoval = [];
   // missiles.forEach(function(missile, i){
   //   missile.update(elapsedTime);
-  //   if(Math.abs(missile.position.x - camera.x) > camera.width * 2)
+  //   if(Math.abs(missile.pool[i] - camera.x) > camera.width * 2)
   //     markedForRemoval.unshift(i);
   // });
   // // Remove missiles that have gone off-screen
@@ -610,9 +634,8 @@ function renderWorld(elapsedTime, ctx, camera) {
     bullets.render(elapsedTime, ctx);
 
     // Render the missiles
-    //missiles.forEach(function(missile) {
-    //  missile.render(elapsedTime, ctx);
-    //});
+    missiles.render(elapsedTime, ctx);
+   
 
     // Render the player
     player.render(elapsedTime, ctx, camera);
@@ -700,4 +723,12 @@ function enemyAndBulletCollision(rect, bullets, index, bulletRadius)
   var dx = distX - rect.width/2;
   var dy = distY - rect.height/2;
   return (dx*dx+dy*dy<=(bulletRadius*bulletRadius));
+}
+
+function enemyAndMissileCollision(rect, missiles, index, missileWidth, missileHeight)
+{
+  return rect.position.x < missiles.pool[index] + missileWidth &&
+    rect.position.x + rect.width > missiles.pool[index] &&
+    rect.position.y < missiles.pool[index+1] + missileHeight &&
+    rect.position.y + rect.height > missiles.pool[index+1];
 }

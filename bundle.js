@@ -7,6 +7,7 @@ const Vector = require('./vector');
 const Camera = require('./camera');
 const Player = require('./player');
 const BulletPool = require('./bullet_pool');
+const MissilePool = require('./missile_pool');
 const FlappyMonster = require('./flappy-monster');
 const Skull = require('./skull');
 const FlappyDragon = require('./flappy-dragon');
@@ -27,7 +28,7 @@ var input = {
 }
 var camera = new Camera(canvas);
 var bullets = new BulletPool(10);
-var missiles = [];
+var missiles = new MissilePool(10);
 var player;
 var backgrounds = [
   new Image(),
@@ -48,6 +49,7 @@ var skullImg = [];
 var flappyDragonImg = [];
 var flappyGrumpyImg = [];
 var shoot = false;
+var missileShoot = false;
 
 /**
  * @function onkeydown
@@ -76,15 +78,32 @@ window.onkeydown = function(event) {
       event.preventDefault();
       break;
    case ' ':
-      if(!shoot)
+      if(player.weapon == "weapon-3" || player.weapon == "weapon-4")
       {
-        shoot = true;
-        console.log("Pew pew!");
-        var audio = new Audio('assets/sounds/player_shoot.wav'); // Created with http://www.bfxr.net/
-        audio.play();
-        player.fireBullet({x: 1, y: 0});
-        break;
-      }  
+        if(!shoot)
+        {
+          shoot = true;
+          console.log("Pew pew!");
+          var audio = new Audio('assets/sounds/player_shoot.wav'); // Created with http://www.bfxr.net/
+          audio.play();
+          player.fireBullet({x: 1, y: 0});
+          break;
+        }
+      }
+      else if(player.weapon == "weapon-1" || player.weapon == "weapon-2") 
+      {
+        if(!missileShoot)
+        {
+          shoot = true;
+          console.log("BOOM");
+          //var audio = new Audio('assets/sounds/player_shoot.wav'); // Created with http://www.bfxr.net/
+          //audio.play();
+          player.fireMissile({x: 1, y: 0});
+          break;
+        }
+      }
+
+        
   }
 }
 
@@ -313,6 +332,11 @@ function update(elapsedTime) {
     return false;
   });
 
+  missiles.update(elapsedTime, function(missile){
+    if(!camera.onScreen(missile)) return true;
+    return false;
+  });
+
   // Update the power up
   powerUps.forEach(function(power){
     power.update(elapsedTime);
@@ -472,7 +496,7 @@ function update(elapsedTime) {
   // var markedForRemoval = [];
   // missiles.forEach(function(missile, i){
   //   missile.update(elapsedTime);
-  //   if(Math.abs(missile.position.x - camera.x) > camera.width * 2)
+  //   if(Math.abs(missile.pool[i] - camera.x) > camera.width * 2)
   //     markedForRemoval.unshift(i);
   // });
   // // Remove missiles that have gone off-screen
@@ -611,9 +635,8 @@ function renderWorld(elapsedTime, ctx, camera) {
     bullets.render(elapsedTime, ctx);
 
     // Render the missiles
-    //missiles.forEach(function(missile) {
-    //  missile.render(elapsedTime, ctx);
-    //});
+    missiles.render(elapsedTime, ctx);
+   
 
     // Render the player
     player.render(elapsedTime, ctx, camera);
@@ -702,7 +725,15 @@ function enemyAndBulletCollision(rect, bullets, index, bulletRadius)
   var dy = distY - rect.height/2;
   return (dx*dx+dy*dy<=(bulletRadius*bulletRadius));
 }
-},{"./bullet_pool":2,"./camera":3,"./flappy-bird":4,"./flappy-dragon":5,"./flappy-grumpy":6,"./flappy-monster":7,"./game":8,"./player":9,"./powerup":10,"./skull":11,"./vector":12}],2:[function(require,module,exports){
+
+function enemyAndMissileCollision(rect, missiles, index, missileWidth, missileHeight)
+{
+  return rect.position.x < missiles.pool[index] + missileWidth &&
+    rect.position.x + rect.width > missiles.pool[index] &&
+    rect.position.y < missiles.pool[index+1] + missileHeight &&
+    rect.position.y + rect.height > missiles.pool[index+1];
+}
+},{"./bullet_pool":2,"./camera":3,"./flappy-bird":4,"./flappy-dragon":5,"./flappy-grumpy":6,"./flappy-monster":7,"./game":8,"./missile_pool":9,"./player":10,"./powerup":11,"./skull":12,"./vector":13}],2:[function(require,module,exports){
 "use strict";
 
 /**
@@ -885,7 +916,7 @@ Camera.prototype.toWorldCoordinates = function(screenCoordinates) {
   return Vector.add(screenCoordinates, this);
 }
 
-},{"./vector":12}],4:[function(require,module,exports){
+},{"./vector":13}],4:[function(require,module,exports){
 "use strict";
 
 /* Classes and Libraries */
@@ -1019,7 +1050,7 @@ FlappyBird.prototype.render = function(elapsedTime, ctx) {
 
 
 
-},{"./vector":12}],5:[function(require,module,exports){
+},{"./vector":13}],5:[function(require,module,exports){
 "use strict";
 
 /* Classes and Libraries */
@@ -1116,7 +1147,7 @@ FlappyDragon.prototype.render = function(elapsedTime, ctx) {
 
 
 
-},{"./vector":12}],6:[function(require,module,exports){
+},{"./vector":13}],6:[function(require,module,exports){
 "use strict";
 
 /* Classes and Libraries */
@@ -1236,7 +1267,7 @@ FlappyGrumpy.prototype.render = function(elapsedTime, ctx) {
 
 
 
-},{"./vector":12}],7:[function(require,module,exports){
+},{"./vector":13}],7:[function(require,module,exports){
 "use strict";
 
 /* Classes and Libraries */
@@ -1351,7 +1382,7 @@ FlappyMonster.prototype.render = function(elapsedTime, ctx) {
 
 
 
-},{"./vector":12}],8:[function(require,module,exports){
+},{"./vector":13}],8:[function(require,module,exports){
 "use strict";
 
 /**
@@ -1412,13 +1443,124 @@ Game.prototype.loop = function(newTime) {
 },{}],9:[function(require,module,exports){
 "use strict";
 
+/**
+ * @module MissilePool
+ * A class for managing bullets in-game
+ * We use a Float32Array to hold our bullet info,
+ * as this creates a single memory buffer we can
+ * iterate over, minimizing cache misses.
+ * Values stored are: positionX, positionY, velocityX,
+ * velocityY in that order.
+ */
+module.exports = exports = MissilePool;
+
+/**
+ * @constructor MissilePool
+ * Creates a MissilePool of the specified size
+ * @param {uint} size the maximum number of bullets to exits concurrently
+ */
+function MissilePool(maxSize) {
+  this.pool = new Float32Array(4 * maxSize);
+  this.end = 0;
+  this.max = maxSize;
+}
+
+/**
+ * @function add
+ * Adds a new bullet to the end of the MissilePool.
+ * If there is no room left, no bullet is created.
+ * @param {Vector} position where the bullet begins
+ * @param {Vector} velocity the bullet's velocity
+*/
+MissilePool.prototype.add = function(position, velocity) {
+  if(this.end < this.max) {
+    this.pool[4*this.end] = position.x;
+    this.pool[4*this.end+1] = position.y;
+    this.pool[4*this.end+2] = velocity.x;
+    this.pool[4*this.end+3] = velocity.y;
+    this.end++;
+  }
+}
+
+/**
+ * @function update
+ * Updates the bullet using its stored velocity, and
+ * calls the callback function passing the transformed
+ * bullet.  If the callback returns true, the bullet is
+ * removed from the pool.
+ * Removed bullets are replaced with the last bullet's values
+ * and the size of the bullet array is reduced, keeping
+ * all live bullets at the front of the array.
+ * @param {DOMHighResTimeStamp} elapsedTime
+ * @param {function} callback called with the bullet's position,
+ * if the return value is true, the bullet is removed from the pool
+ */
+MissilePool.prototype.update = function(elapsedTime, callback) {
+  for(var i = 0; i < this.end; i++){
+    // Move the bullet
+    this.pool[4*i] += this.pool[4*i+2];
+    this.pool[4*i+1] += this.pool[4*i+3];
+    // If a callback was supplied, call it
+    if(callback && callback({
+      x: this.pool[4*i],
+      y: this.pool[4*i+1]
+    })) {
+      // Swap the current and last bullet if we
+      // need to remove the current bullet
+      this.pool[4*i] = this.pool[4*(this.end-1)];
+      this.pool[4*i+1] = this.pool[4*(this.end-1)+1];
+      this.pool[4*i+2] = this.pool[4*(this.end-1)+2];
+      this.pool[4*i+3] = this.pool[4*(this.end-1)+3];
+      // Reduce the total number of bullets by 1
+      this.end--;
+      // Reduce our iterator by 1 so that we update the
+      // freshly swapped bullet.
+      i--;
+    }
+  }
+}
+
+/**
+ * @function render
+ * Renders all bullets in our array.
+ * @param {DOMHighResTimeStamp} elapsedTime
+ * @param {CanvasRenderingContext2D} ctx
+ */
+MissilePool.prototype.render = function(elapsedTime, ctx) {
+  // Render the bullets as a single path
+  // ctx.save();
+  // ctx.beginPath();
+  // for(var i = 0; i < this.end; i++) {
+  //   ctx.moveTo(this.pool[4*i], this.pool[4*i+1]);
+  //   var img = new Image();
+  //   img.src = 'assets/weapons/torpedo.png';
+  //   ctx.drawImage(img, 0, 0, 64, 64);
+  // }
+  // ctx.restore();
+  ctx.save();
+  ctx.beginPath();
+  ctx.fillStyle = "white";
+  for(var i = 0; i < this.end; i++) {
+    ctx.moveTo(this.pool[4*i], this.pool[4*i+1]);
+    // (x,y,r,sAngle,eAngle,counterclockwise)
+    var img = new Image();
+    img.src = 'assets/weapons/torpedo.png';
+    ctx.drawImage(img, this.pool[4*i], this.pool[4*i+1], 64, 64);
+  }
+  ctx.fill();
+  ctx.restore();
+}
+
+},{}],10:[function(require,module,exports){
+"use strict";
+
 /* Classes and Libraries */
 const Vector = require('./vector');
-//const Missile = require('./missile');
 
 /* Constants */
 const PLAYER_SPEED = 5;
 const BULLET_SPEED = 10;
+const MISSILE_SPEED = 5;
 const MS_PER_FRAME = 1000/8;
 
 // var img1 = 'assets/enemies/flappy-cat/flying/frame-1.png';
@@ -1628,16 +1770,24 @@ Player.prototype.fireBullet = function(direction) {
  * Fires a missile, if the player still has missiles
  * to fire.
  */
-Player.prototype.fireMissile = function() {
-  if(this.missileCount > 0){
-    var position = Vector.add(this.position, {x:30, y:30})
-    var missile = new Missile(position);
-    this.missiles.push(missile);
-    this.missileCount--;
-  }
+// Player.prototype.fireMissile = function() {
+//   if(this.missileCount > 0){
+//     var position = Vector.add(this.position, {x:30, y:30})
+//     //var missile = new MissilePool(position);
+//     var missile = new MissilePool(10);
+//     this.missiles.push(missile);
+//     this.missileCount--;
+//   }
+Player.prototype.fireMissile= function(direction) {
+  var position = Vector.add(this.position, {x:30, y:30});
+  var velocity = Vector.scale(Vector.normalize(direction), MISSILE_SPEED);
+  this.missiles.add(position, velocity);
+  console.log("Missile fired at (" + position.x + ", " + position.y + ")");
 }
 
-},{"./vector":12}],10:[function(require,module,exports){
+
+
+},{"./vector":13}],11:[function(require,module,exports){
 "use strict";
 
 /**
@@ -1689,7 +1839,7 @@ Powerup.prototype.render = function(elapasedTime, ctx, camera) {
 
 
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 
 /* Classes and Libraries */
@@ -1820,7 +1970,7 @@ Skull.prototype.render = function(elapsedTime, ctx) {
 
 
 
-},{"./vector":12}],12:[function(require,module,exports){
+},{"./vector":13}],13:[function(require,module,exports){
 "use strict";
 
 /**
