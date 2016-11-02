@@ -40,50 +40,14 @@ var flappyDragons = [];
 var flappyGrumpys = [];
 var flappyBirds = [];
 var powerUps = [];
-var reticule = {
-  x: 0,
-  y: 0
-}
+var score = 0;
 var playerImg = [];
 var flappyBirdImg = [];
 var flappyMonsterImg = [];
 var skullImg = [];
 var flappyDragonImg = [];
 var flappyGrumpyImg = [];
-
-/**
- * @function onmousemove
- * Handles mouse move events
- */
-window.onmousemove = function(event) {
-  event.preventDefault();
-  reticule.x = event.offsetX;
-  reticule.y = event.offsetY;
-}
-
-/**
- * @function onmousedown
- * Handles mouse left-click events
- */
-window.onmousedown = function(event) {
-  event.preventDefault();
-  reticule.x = event.offsetX;
-  reticule.y = event.offsetY;
-  // TODO: Fire bullet in direction of the retciule
-  bullets.add(player.position, {x:10, y:0});
-  player.fireBullet(reticule);
-}
-
-/**
- * @function oncontextmenu
- * Handles mouse right-click events
- */
-window.oncontextmenu = function(event) {
-  event.preventDefault();
-  reticule.x = event.offsetX;
-  reticule.y = event.offsetY;
-  // TODO: Fire missile
-}
+var shoot = false;
 
 /**
  * @function onkeydown
@@ -111,6 +75,16 @@ window.onkeydown = function(event) {
       input.right = true;
       event.preventDefault();
       break;
+   case ' ':
+      if(!shoot)
+      {
+        shoot = true;
+        console.log("Pew pew!");
+        var audio = new Audio('assets/sounds/player_shoot.wav'); // Created with http://www.bfxr.net/
+        audio.play();
+        player.fireBullet({x: 1, y: 0});
+        break;
+      }  
   }
 }
 
@@ -139,6 +113,9 @@ window.onkeyup = function(event) {
     case "d":
       input.right = false;
       event.preventDefault();
+      break;
+    case ' ':
+      shoot = false;
       break;
   }
 }
@@ -332,7 +309,7 @@ function update(elapsedTime) {
 
   // Update bullets
   bullets.update(elapsedTime, function(bullet){
-    //if(!camera.onScreen(bullet)) return true;
+    if(!camera.onScreen(bullet)) return true;
     return false;
   });
 
@@ -344,7 +321,6 @@ function update(elapsedTime) {
       const MAX = 4;  // There are 4 possible weapons 
       const MIN = 1;
       var randomNumber = Math.floor(Math.random() * MAX) + MIN
-      console.log("Power up: " + randomNumber);
       power.active = false;
 
       switch(randomNumber)
@@ -370,18 +346,22 @@ function update(elapsedTime) {
     monster.update(elapsedTime);
     if(checkCollision(player, monster))
     {
-      console.log("Collision!");
-      console.log("Player: " + "(" + player.position.x + "," + player.position.y + ")");
-      console.log("Flappy monster: (" + monster.position.x
-        + "," + monster.position.y + ")");
+      player.lives--;
       player.state = "hit";
       player.frame = "frame-10";
       player.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
     }
-    // if(checkCollision(bullets, monster))
-    // {
-    //   console.log("Bullet collision!");
-    // }
+    for(var i = 0; i < bullets.pool.length; i+=4) {
+      if(enemyAndBulletCollision(monster, bullets, i, 2))
+      {
+        monster.active = false;
+
+        // Remove the bullets (TO DO: fix this so it only removes one)
+        bullets.update(elapsedTime, function(bullet){
+          return true;
+        });
+      }
+    }
   });
 
   // Update the flappy cats
@@ -392,18 +372,23 @@ function update(elapsedTime) {
       skull.state = "hit";
       //skull.frame = "frame-3";
       skull.img.src = 'assets/enemies/skull/hit/frame.png';
-      console.log("Skull collision!");
       player.state = "hit";
       player.frame = "frame-10";
       player.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
       //player.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
+      player.lives--;
     }
-    // if(checkCollision(bullets, dragon))
-    // {
-    //   skull.state = "hit";
-    //   skull.img.src = 'assets/enemies/skull/hit/frame.png';
-    //   console.log("Bullet collision!");
-    // }
+  for(var i = 0; i < bullets.pool.length; i+=4) {
+    if(enemyAndBulletCollision(skull, bullets, i, 2))
+    {
+      skull.active = false;
+
+      // Remove the bullets (TO DO: fix this so it only removes one)
+      bullets.update(elapsedTime, function(bullet){
+        return true;
+      });
+    }
+  }
   });
 
   // Update the flappy dragons
@@ -414,12 +399,18 @@ function update(elapsedTime) {
       player.state = "hit";
       player.frame = "frame-10";
       player.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
-      console.log("Dragon collision! ROAR");
+      player.lives--;
     }
-    // if(checkCollision(bullets, dragon))
-    // {
-    //   console.log("Bullet collision!");
-    // }
+    for(var i = 0; i < bullets.pool.length; i+=4) {
+        if(enemyAndBulletCollision(dragon, bullets, i, 2))
+        {
+          dragon.active = false;
+
+          bullets.update(elapsedTime, function(bullet){
+          return true;
+      });
+        }
+      }
   });
 
   // Update the flappy grumpys
@@ -429,13 +420,18 @@ function update(elapsedTime) {
     {
       player.state = "hit";
       player.frame = "frame-10";
-      //player.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
-      console.log("Grumpy collision! That should make you grumpy.");
+      player.lives--;
     }
-    // if(checkCollision(bullets, grumpy))
-    // {
-    //   console.log("Bullet collision!");
-    // }
+    for(var i = 0; i < bullets.pool.length; i+=4) {
+        if(enemyAndBulletCollision(grumpy, bullets, i, 2))
+        {
+          grumpy.active = false;
+
+          bullets.update(elapsedTime, function(bullet){
+            return true;
+          });
+        }
+      }
   });
 
   // Update the flappy grumpys
@@ -449,13 +445,20 @@ function update(elapsedTime) {
       bird.state = "hit";
       bird.frame = "frame-5";
       bird.img.src = 'assets/enemies/flappy-bird/hit/frame-2.png';
-      console.log("Bird collision! That bird flew the coop!");
+      player.lives--;
     }
-    // if(checkCollision(bullets, bird))
-    // {
-    //   console.log("Bullet collision!");
-    // }
+    for(var i = 0; i < bullets.pool.length; i+=4) {
+      if(enemyAndBulletCollision(bird, bullets, i, 2))
+      {
+        bird.active = false;
+
+        bullets.update(elapsedTime, function(bullet){
+          return true;
+        });
+      }
+    }
   });
+
 
   /* Remove unwanted enemies and powerups */
   flappyMonsters = flappyMonsters.filter(function(monster){ return monster.active; });
@@ -579,6 +582,7 @@ function render(elapsedTime, ctx) {
   ctx.drawImage(backgrounds[0], 5000, 0, canvas.width, canvas.height);
   ctx.restore();
 
+
   // Transform the coordinate system using
   // the camera position BEFORE rendering
   // objects in the world - that way they
@@ -643,6 +647,18 @@ function renderWorld(elapsedTime, ctx, camera) {
     flappyBirds.forEach(function(FlappyBird){
       FlappyBird.render(elapsedTime, ctx);
     });
+
+    // ctx.save();
+    // ctx.translate(reticule.x, reticule.y);
+    // ctx.beginPath();
+    // ctx.arc(0, 0, 10, 0, 2*Math.PI);
+    // ctx.moveTo(0, 15);
+    // ctx.lineTo(0, -15);
+    // ctx.moveTo(15, 0);
+    // ctx.lineTo(-15, 0);
+    // ctx.strokeStyle = '#00ff00';
+    // ctx.stroke();
+    // ctx.restore();
 }
 
 /**
@@ -653,17 +669,7 @@ function renderWorld(elapsedTime, ctx, camera) {
   */
 function renderGUI(elapsedTime, ctx) {
   // TODO: Render the GUI
-  ctx.save();
-  ctx.translate(reticule.x, reticule.y);
-  ctx.beginPath();
-  ctx.arc(0, 0, 10, 0, 2*Math.PI);
-  ctx.moveTo(0, 15);
-  ctx.lineTo(0, -15);
-  ctx.moveTo(15, 0);
-  ctx.lineTo(-15, 0);
-  ctx.strokeStyle = '#00ff00';
-  ctx.stroke();
-  ctx.restore();
+  
 }
 
 /**
@@ -679,6 +685,22 @@ function checkCollision(a, b)
     a.position.x + a.width > b.position.x &&
     a.position.y < b.position.y + b.height &&
     a.position.y + a.height > b.position.y;
+}
+
+function enemyAndBulletCollision(rect, bullets, index, bulletRadius)
+{
+  var distX = Math.abs(bullets.pool[index] - rect.position.x - rect.width / 2);
+  var distY = Math.abs(bullets.pool[index+1] - rect.position.y - rect.height / 2);
+
+  if(distX > (rect.width/2 + bulletRadius)) { return false; }
+  if(distY > (rect.height/2 + bulletRadius)) { return false; }
+
+  if(distX <= (rect.width/2)) { return true; }
+  if(distY <= (rect.height/2)) { return true; }
+
+  var dx = distX - rect.width/2;
+  var dy = distY - rect.height/2;
+  return (dx*dx+dy*dy<=(bulletRadius*bulletRadius));
 }
 },{"./bullet_pool":2,"./camera":3,"./flappy-bird":4,"./flappy-dragon":5,"./flappy-grumpy":6,"./flappy-monster":7,"./game":8,"./player":9,"./powerup":10,"./skull":11,"./vector":12}],2:[function(require,module,exports){
 "use strict";
@@ -824,7 +846,8 @@ Camera.prototype.update = function(target) {
     self.xOff = self.xMin;
   }
 
-  if(self.x < 0) self.x = 0;
+  if(self.position.x < 0) self.position.x = 0;
+  console.log("Camera: (" + self.position.x + "," + self.position.y + ")");
 }
 
 /**
@@ -835,10 +858,10 @@ Camera.prototype.update = function(target) {
  */
 Camera.prototype.onScreen = function(target) {
   return (
-     target.x > this.x &&
-     target.x < this.x + this.width &&
-     target.y > this.y &&
-     target.y < this.y + this.height
+     target.x > this.position.x &&
+     target.x < this.position.x + this.width &&
+     target.y > this.position.y &&
+     target.y < this.position.y + this.height
    );
 }
 
@@ -973,11 +996,8 @@ FlappyBird.prototype.update = function(elapsedTime) {
   //if(this.position.x > 1024) this.position.x = 1024;
   //if(this.position.y > 786) this.position.y = 786;
 
-  var self = this;
-  setTimeout(function() {
-    self.animate(elapsedTime);
-  }, 1000
-  );
+  this.animate(elapsedTime);
+ 
 }
 
 /**
@@ -1070,23 +1090,12 @@ function FlappyDragon(xPos, yPos, img) {
  * @param {DOMHighResTimeStamp} elapedTime
  */
 FlappyDragon.prototype.update = function(elapsedTime) {
-  // move the player
   this.velocity.x += PLAYER_SPEED;
   this.position.x += PLAYER_SPEED;
   this.active = this.active;
 
-  // don't let the player move off-screen
-  //if(this.position.x < 0) this.position.x = 0;
-  //if(this.position.x > 1024) this.position.x = 1024;
-  //if(this.position.y > 786) this.position.y = 786;
-
   // animate the monster
-  var self = this;
-  setTimeout(function() {
-    self.animate(elapsedTime);
-  }, 1000
-  );
-  
+  this.animate(elapsedTime);
 }
 
 /**
@@ -1205,11 +1214,7 @@ FlappyGrumpy.prototype.update = function(elapsedTime) {
   //if(this.position.y > 786) this.position.y = 786;
 
   // animate the monster
-  var self = this;
-  setTimeout(function() {
-    self.animate(elapsedTime);
-  }, 1000
-  );
+  this.animate(elapsedTime);
   
 }
 
@@ -1323,17 +1328,8 @@ FlappyMonster.prototype.update = function(elapsedTime) {
   this.position.x += PLAYER_SPEED;
   this.active = this.active;
 
-  // don't let the player move off-screen
-  //if(this.position.x < 0) this.position.x = 0;
-  //if(this.position.x > 1024) this.position.x = 1024;
-  //if(this.position.y > 786) this.position.y = 786;
-
   // animate the monster
-  var self = this;
-  setTimeout(function() {
-    self.animate(elapsedTime);
-  }, 1000
-  );
+  this.animate(elapsedTime);
   
 }
 
@@ -1461,6 +1457,7 @@ function Player(bullets, missiles, weapon, img) {
   this.frame = 'frame-1';
   this.weapon = weapon;
   this.img = img[0];
+  this.lives = 3;
 
   var self = this;
   self.animate = function(time)
@@ -1534,10 +1531,7 @@ function Player(bullets, missiles, weapon, img) {
  */
 Player.prototype.update = function(elapsedTime, input) {
   var self = this;
-  setTimeout(function() {
-    self.animate(elapsedTime);
-  }, 1000
-  );
+  self.animate(elapsedTime);
 
   //this.weapon = this.weapon;
   
@@ -1550,9 +1544,9 @@ Player.prototype.update = function(elapsedTime, input) {
   if(input.down) this.velocity.y += PLAYER_SPEED;
 
   // determine player angle
-  this.angle = 0;
-  if(this.velocity.x < 0) this.angle = -1;
-  if(this.velocity.x > 0) this.angle = 1;
+  // this.angle = 0;
+  // if(this.velocity.x < 0) this.angle = -1;
+  // if(this.velocity.x > 0) this.angle = 1;
 
   // move the player
   this.position.x += this.velocity.x;
@@ -1626,7 +1620,7 @@ Player.prototype.fireBullet = function(direction) {
   var position = Vector.add(this.position, {x:30, y:30});
   var velocity = Vector.scale(Vector.normalize(direction), BULLET_SPEED);
   this.bullets.add(position, velocity);
-  console.log("Bullet fired at (" + direction.x + ", " + direction.y + ")");
+  console.log("Bullet fired at (" + position.x + ", " + position.y + ")");
 }
 
 /**
@@ -1636,7 +1630,7 @@ Player.prototype.fireBullet = function(direction) {
  */
 Player.prototype.fireMissile = function() {
   if(this.missileCount > 0){
-    var position = Vector.add(this.position, {x:0, y:30})
+    var position = Vector.add(this.position, {x:30, y:30})
     var missile = new Missile(position);
     this.missiles.push(missile);
     this.missileCount--;

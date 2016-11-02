@@ -39,50 +39,14 @@ var flappyDragons = [];
 var flappyGrumpys = [];
 var flappyBirds = [];
 var powerUps = [];
-var reticule = {
-  x: 0,
-  y: 0
-}
+var score = 0;
 var playerImg = [];
 var flappyBirdImg = [];
 var flappyMonsterImg = [];
 var skullImg = [];
 var flappyDragonImg = [];
 var flappyGrumpyImg = [];
-
-/**
- * @function onmousemove
- * Handles mouse move events
- */
-window.onmousemove = function(event) {
-  event.preventDefault();
-  reticule.x = event.offsetX;
-  reticule.y = event.offsetY;
-}
-
-/**
- * @function onmousedown
- * Handles mouse left-click events
- */
-window.onmousedown = function(event) {
-  event.preventDefault();
-  reticule.x = event.offsetX;
-  reticule.y = event.offsetY;
-  // TODO: Fire bullet in direction of the retciule
-  bullets.add(player.position, {x:10, y:0});
-  player.fireBullet(reticule);
-}
-
-/**
- * @function oncontextmenu
- * Handles mouse right-click events
- */
-window.oncontextmenu = function(event) {
-  event.preventDefault();
-  reticule.x = event.offsetX;
-  reticule.y = event.offsetY;
-  // TODO: Fire missile
-}
+var shoot = false;
 
 /**
  * @function onkeydown
@@ -110,6 +74,16 @@ window.onkeydown = function(event) {
       input.right = true;
       event.preventDefault();
       break;
+   case ' ':
+      if(!shoot)
+      {
+        shoot = true;
+        console.log("Pew pew!");
+        var audio = new Audio('assets/sounds/player_shoot.wav'); // Created with http://www.bfxr.net/
+        audio.play();
+        player.fireBullet({x: 1, y: 0});
+        break;
+      }  
   }
 }
 
@@ -138,6 +112,9 @@ window.onkeyup = function(event) {
     case "d":
       input.right = false;
       event.preventDefault();
+      break;
+    case ' ':
+      shoot = false;
       break;
   }
 }
@@ -331,7 +308,7 @@ function update(elapsedTime) {
 
   // Update bullets
   bullets.update(elapsedTime, function(bullet){
-    //if(!camera.onScreen(bullet)) return true;
+    if(!camera.onScreen(bullet)) return true;
     return false;
   });
 
@@ -343,7 +320,6 @@ function update(elapsedTime) {
       const MAX = 4;  // There are 4 possible weapons 
       const MIN = 1;
       var randomNumber = Math.floor(Math.random() * MAX) + MIN
-      console.log("Power up: " + randomNumber);
       power.active = false;
 
       switch(randomNumber)
@@ -369,18 +345,22 @@ function update(elapsedTime) {
     monster.update(elapsedTime);
     if(checkCollision(player, monster))
     {
-      console.log("Collision!");
-      console.log("Player: " + "(" + player.position.x + "," + player.position.y + ")");
-      console.log("Flappy monster: (" + monster.position.x
-        + "," + monster.position.y + ")");
+      player.lives--;
       player.state = "hit";
       player.frame = "frame-10";
       player.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
     }
-    // if(checkCollision(bullets, monster))
-    // {
-    //   console.log("Bullet collision!");
-    // }
+    for(var i = 0; i < bullets.pool.length; i+=4) {
+      if(enemyAndBulletCollision(monster, bullets, i, 2))
+      {
+        monster.active = false;
+
+        // Remove the bullets (TO DO: fix this so it only removes one)
+        bullets.update(elapsedTime, function(bullet){
+          return true;
+        });
+      }
+    }
   });
 
   // Update the flappy cats
@@ -391,18 +371,23 @@ function update(elapsedTime) {
       skull.state = "hit";
       //skull.frame = "frame-3";
       skull.img.src = 'assets/enemies/skull/hit/frame.png';
-      console.log("Skull collision!");
       player.state = "hit";
       player.frame = "frame-10";
       player.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
       //player.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
+      player.lives--;
     }
-    // if(checkCollision(bullets, dragon))
-    // {
-    //   skull.state = "hit";
-    //   skull.img.src = 'assets/enemies/skull/hit/frame.png';
-    //   console.log("Bullet collision!");
-    // }
+  for(var i = 0; i < bullets.pool.length; i+=4) {
+    if(enemyAndBulletCollision(skull, bullets, i, 2))
+    {
+      skull.active = false;
+
+      // Remove the bullets (TO DO: fix this so it only removes one)
+      bullets.update(elapsedTime, function(bullet){
+        return true;
+      });
+    }
+  }
   });
 
   // Update the flappy dragons
@@ -413,12 +398,18 @@ function update(elapsedTime) {
       player.state = "hit";
       player.frame = "frame-10";
       player.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
-      console.log("Dragon collision! ROAR");
+      player.lives--;
     }
-    // if(checkCollision(bullets, dragon))
-    // {
-    //   console.log("Bullet collision!");
-    // }
+    for(var i = 0; i < bullets.pool.length; i+=4) {
+        if(enemyAndBulletCollision(dragon, bullets, i, 2))
+        {
+          dragon.active = false;
+
+          bullets.update(elapsedTime, function(bullet){
+          return true;
+      });
+        }
+      }
   });
 
   // Update the flappy grumpys
@@ -428,13 +419,18 @@ function update(elapsedTime) {
     {
       player.state = "hit";
       player.frame = "frame-10";
-      //player.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
-      console.log("Grumpy collision! That should make you grumpy.");
+      player.lives--;
     }
-    // if(checkCollision(bullets, grumpy))
-    // {
-    //   console.log("Bullet collision!");
-    // }
+    for(var i = 0; i < bullets.pool.length; i+=4) {
+        if(enemyAndBulletCollision(grumpy, bullets, i, 2))
+        {
+          grumpy.active = false;
+
+          bullets.update(elapsedTime, function(bullet){
+            return true;
+          });
+        }
+      }
   });
 
   // Update the flappy grumpys
@@ -448,13 +444,20 @@ function update(elapsedTime) {
       bird.state = "hit";
       bird.frame = "frame-5";
       bird.img.src = 'assets/enemies/flappy-bird/hit/frame-2.png';
-      console.log("Bird collision! That bird flew the coop!");
+      player.lives--;
     }
-    // if(checkCollision(bullets, bird))
-    // {
-    //   console.log("Bullet collision!");
-    // }
+    for(var i = 0; i < bullets.pool.length; i+=4) {
+      if(enemyAndBulletCollision(bird, bullets, i, 2))
+      {
+        bird.active = false;
+
+        bullets.update(elapsedTime, function(bullet){
+          return true;
+        });
+      }
+    }
   });
+
 
   /* Remove unwanted enemies and powerups */
   flappyMonsters = flappyMonsters.filter(function(monster){ return monster.active; });
@@ -643,6 +646,18 @@ function renderWorld(elapsedTime, ctx, camera) {
     flappyBirds.forEach(function(FlappyBird){
       FlappyBird.render(elapsedTime, ctx);
     });
+
+    // ctx.save();
+    // ctx.translate(reticule.x, reticule.y);
+    // ctx.beginPath();
+    // ctx.arc(0, 0, 10, 0, 2*Math.PI);
+    // ctx.moveTo(0, 15);
+    // ctx.lineTo(0, -15);
+    // ctx.moveTo(15, 0);
+    // ctx.lineTo(-15, 0);
+    // ctx.strokeStyle = '#00ff00';
+    // ctx.stroke();
+    // ctx.restore();
 }
 
 /**
@@ -653,17 +668,7 @@ function renderWorld(elapsedTime, ctx, camera) {
   */
 function renderGUI(elapsedTime, ctx) {
   // TODO: Render the GUI
-  ctx.save();
-  ctx.translate(reticule.x, reticule.y);
-  ctx.beginPath();
-  ctx.arc(0, 0, 10, 0, 2*Math.PI);
-  ctx.moveTo(0, 15);
-  ctx.lineTo(0, -15);
-  ctx.moveTo(15, 0);
-  ctx.lineTo(-15, 0);
-  ctx.strokeStyle = '#00ff00';
-  ctx.stroke();
-  ctx.restore();
+  
 }
 
 /**
@@ -679,4 +684,20 @@ function checkCollision(a, b)
     a.position.x + a.width > b.position.x &&
     a.position.y < b.position.y + b.height &&
     a.position.y + a.height > b.position.y;
+}
+
+function enemyAndBulletCollision(rect, bullets, index, bulletRadius)
+{
+  var distX = Math.abs(bullets.pool[index] - rect.position.x - rect.width / 2);
+  var distY = Math.abs(bullets.pool[index+1] - rect.position.y - rect.height / 2);
+
+  if(distX > (rect.width/2 + bulletRadius)) { return false; }
+  if(distY > (rect.height/2 + bulletRadius)) { return false; }
+
+  if(distX <= (rect.width/2)) { return true; }
+  if(distY <= (rect.height/2)) { return true; }
+
+  var dx = distX - rect.width/2;
+  var dy = distY - rect.height/2;
+  return (dx*dx+dy*dy<=(bulletRadius*bulletRadius));
 }

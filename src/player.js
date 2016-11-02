@@ -45,6 +45,7 @@ function Player(bullets, missiles, weapon, img) {
   this.frame = 'frame-1';
   this.weapon = weapon;
   this.img = img[0];
+  this.lives = 3;
 
   var self = this;
   self.animate = function(time)
@@ -118,10 +119,7 @@ function Player(bullets, missiles, weapon, img) {
  */
 Player.prototype.update = function(elapsedTime, input) {
   var self = this;
-  setTimeout(function() {
-    self.animate(elapsedTime);
-  }, 1000
-  );
+  self.animate(elapsedTime);
 
   //this.weapon = this.weapon;
   
@@ -134,9 +132,9 @@ Player.prototype.update = function(elapsedTime, input) {
   if(input.down) this.velocity.y += PLAYER_SPEED;
 
   // determine player angle
-  this.angle = 0;
-  if(this.velocity.x < 0) this.angle = -1;
-  if(this.velocity.x > 0) this.angle = 1;
+  // this.angle = 0;
+  // if(this.velocity.x < 0) this.angle = -1;
+  // if(this.velocity.x > 0) this.angle = 1;
 
   // move the player
   this.position.x += this.velocity.x;
@@ -210,7 +208,7 @@ Player.prototype.fireBullet = function(direction) {
   var position = Vector.add(this.position, {x:30, y:30});
   var velocity = Vector.scale(Vector.normalize(direction), BULLET_SPEED);
   this.bullets.add(position, velocity);
-  console.log("Bullet fired at (" + direction.x + ", " + direction.y + ")");
+  console.log("Bullet fired at (" + position.x + ", " + position.y + ")");
 }
 
 /**
@@ -220,7 +218,7 @@ Player.prototype.fireBullet = function(direction) {
  */
 Player.prototype.fireMissile = function() {
   if(this.missileCount > 0){
-    var position = Vector.add(this.position, {x:0, y:30})
+    var position = Vector.add(this.position, {x:30, y:30})
     var missile = new Missile(position);
     this.missiles.push(missile);
     this.missileCount--;

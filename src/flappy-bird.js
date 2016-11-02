@@ -108,11 +108,8 @@ FlappyBird.prototype.update = function(elapsedTime) {
   //if(this.position.x > 1024) this.position.x = 1024;
   //if(this.position.y > 786) this.position.y = 786;
 
-  var self = this;
-  setTimeout(function() {
-    self.animate(elapsedTime);
-  }, 1000
-  );
+  this.animate(elapsedTime);
+ 
 }
 
 /**

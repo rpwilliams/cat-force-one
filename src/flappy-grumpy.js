@@ -95,11 +95,7 @@ FlappyGrumpy.prototype.update = function(elapsedTime) {
   //if(this.position.y > 786) this.position.y = 786;
 
   // animate the monster
-  var self = this;
-  setTimeout(function() {
-    self.animate(elapsedTime);
-  }, 1000
-  );
+  this.animate(elapsedTime);
   
 }
 

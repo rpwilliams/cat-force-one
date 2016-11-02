@@ -42,7 +42,8 @@ Camera.prototype.update = function(target) {
     self.xOff = self.xMin;
   }
 
-  if(self.x < 0) self.x = 0;
+  if(self.position.x < 0) self.position.x = 0;
+  console.log("Camera: (" + self.position.x + "," + self.position.y + ")");
 }
 
 /**
@@ -53,10 +54,10 @@ Camera.prototype.update = function(target) {
  */
 Camera.prototype.onScreen = function(target) {
   return (
-     target.x > this.x &&
-     target.x < this.x + this.width &&
-     target.y > this.y &&
-     target.y < this.y + this.height
+     target.x > this.position.x &&
+     target.x < this.position.x + this.width &&
+     target.y > this.position.y &&
+     target.y < this.position.y + this.height
    );
 }
 

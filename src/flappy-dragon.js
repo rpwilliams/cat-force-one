@@ -68,23 +68,12 @@ function FlappyDragon(xPos, yPos, img) {
  * @param {DOMHighResTimeStamp} elapedTime
  */
 FlappyDragon.prototype.update = function(elapsedTime) {
-  // move the player
   this.velocity.x += PLAYER_SPEED;
   this.position.x += PLAYER_SPEED;
   this.active = this.active;
 
-  // don't let the player move off-screen
-  //if(this.position.x < 0) this.position.x = 0;
-  //if(this.position.x > 1024) this.position.x = 1024;
-  //if(this.position.y > 786) this.position.y = 786;
-
   // animate the monster
-  var self = this;
-  setTimeout(function() {
-    self.animate(elapsedTime);
-  }, 1000
-  );
-  
+  this.animate(elapsedTime);
 }
 
 /**
