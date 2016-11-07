@@ -32,7 +32,7 @@ function FlappyMonster(xPos, yPos, img) {
   this.width = 64;
   this.active = true;
   this.collidedWithPlayer = false; // Don't allow duplicate collisions
-  this.health = 2;
+  this.health = 1;
 
   var self = this;
   self.animate = function(time)

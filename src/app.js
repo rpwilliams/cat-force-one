@@ -31,6 +31,11 @@ var bullets = new BulletPool(20);
 var missiles = new MissilePool(10);
 var player;
 
+/* Music */
+var level1Music;
+var level2Music;
+var level3Music;
+
 /* Enemies */
 var flappyMonsters = [];
 var skulls = [];
@@ -51,6 +56,7 @@ var shoot = false;
 var missileShoot = false;
 
 /* Other */
+var winCheck = false;
 var gameOverCheck = false;
 var explosions = [];
 var powerUps = [];
@@ -97,17 +103,6 @@ window.onkeydown = function(event) {
       input.down = true;
       event.preventDefault();
       break;
-    // case "ArrowLeft":
-    // case "a":
-    //   input.left = true;
-    //   event.preventDefault();
-    //   break;
-    // case "ArrowRight":
-    // case "d":
-    //   input.right = true;
-    //   event.preventDefault();
-    //   break;
-    /* Shoot a projectile if space is selected */
     case ' ':
       if(player.weapon == "weapon-1")
       {
@@ -141,7 +136,7 @@ window.onkeydown = function(event) {
       {
         if(!shoot)
         {
-          bullets.color = "yellow";
+          bullets.color = "blue";
           shoot = true;
           console.log("Pew pew!");
           var audio = new Audio('assets/sounds/weapon-3.wav'); // Created with http://www.bfxr.net/
@@ -172,9 +167,12 @@ window.onkeypress=function(event) {
   {
     level = 1;
     score = 0;
+    winCheck = false;
     init();
     document.getElementById('game-over').innerHTML = "";
     document.getElementById('continue').innerHTML = "";
+    document.getElementById('game-over-black').innerHTML = "";
+    document.getElementById('continue-black').innerHTML = "";
     gameOverCheck = false;
   }  
 }
@@ -195,22 +193,13 @@ window.onkeyup = function(event) {
       input.down = false;
       event.preventDefault();
       break;
-    // case "ArrowLeft":
-    // case "a":
-    //   input.left = false;
-    //   event.preventDefault();
-    //   break;
-    // case "ArrowRight":
-    // case "d":
-    //   input.right = false;
-    //   event.preventDefault();
-    //   break;
     case ' ':
       shoot = false;
       missileShoot = false;
       break;
   }
 }
+
 
 /**
  * @function init
@@ -225,6 +214,10 @@ function init()
     All images are public domain and from opengameart.org
     */
 
+    // http://www.dl-sounds.com/royalty-free/star-commander1/
+    level1Music = new Audio('assets/music/level-1-music.wav');
+    level1Music.play();
+  
     // Load the background images
     backgrounds[0].src = 'assets/backgrounds/city-foreground-extended.png';
     backgrounds[1].src = 'assets/backgrounds/city-background-extended.png';
@@ -240,7 +233,6 @@ function init()
     // Level 3 Background
     backgrounds[6].src = 'assets/backgrounds/graveyard-background-extended.png';
     backgrounds[7].src = 'assets/backgrounds/layer-2.png';
-
 
     // Load the player (cat) images
     playerImg[0] = new Image();
@@ -335,20 +327,20 @@ function init()
     player = new Player(bullets, missiles, "weapon-1", playerImg);
     camera = new Camera(canvas);
 
+    // Randomly generate skulls
     for(var i = 0; i < 20; i++)
     {
       var randomSkullX = Math.floor(Math.random() * 5000) + 0;
       var randomSkullY = Math.floor(Math.random() * 1000) + 1;
       skulls.push(new Skull(randomSkullX, randomSkullY, canvas, skullImg));
     }
-
+    // Randomly generate flappy grumpys
     for(var i = 0; i < 15; i++)
     {
       var randomGrumpyX = Math.floor(Math.random() * 10000) + 0;
       var randomGrumpyY = Math.floor(Math.random() * 700) + 1;
       flappyGrumpys.push(new FlappyGrumpy(randomGrumpyX, randomGrumpyY, flappyGrumpyImg));
     }
-
   }
   else if(level == 2)
   {
@@ -357,14 +349,20 @@ function init()
     reinitializeEnemies();
     player.lives = 5;
 
+    // http://www.dl-sounds.com/royalty-free/fantasy-island/
+    level1Music.pause();
+    level2Music = new Audio('assets/music/level-2-music.mp3');  
+    level2Music.play();
+
+    // Randomly generate flappy monsters
     for(var i = 0; i < 30; i++)
     {
       var randomMonsterX = Math.floor(Math.random() * 5000) + 0;
       var randomMonsterY = Math.floor(Math.random() * 700) + 1;
       flappyMonsters.push(new FlappyMonster(randomMonsterX, randomMonsterY, flappyMonsterImg));
     }
-
-    for(var i = 0; i < 50; i++)
+    // Randomly generate flappy dragons
+    for(var i = 0; i < 75; i++)
     {
       var randomDragonX = Math.floor(Math.random() * 27000) + 1000;
       var randomDragonY = Math.floor(Math.random() * 700) + 1;
@@ -373,53 +371,63 @@ function init()
   }
   else if(level == 3)
   {
-    player = new Player(bullets, missiles, "weapon-1", playerImg);
+    player = new Player(bullets, missiles, "weapon-2", playerImg);
     camera = new Camera(canvas);
     reinitializeEnemies();
     player.lives = 5;
     bullets.color = "black";
 
-    for(var i = 0; i < 15; i++)
+    // http://www.dl-sounds.com/royalty-free/discotek-loop/
+    level2Music.pause();
+    level3Music = new Audio('assets/music/level-3-music.wav');
+    level3Music.play();
+  
+    // Randomly generate flappy monsters
+    for(var i = 0; i < 30; i++)
     {
       var randomMonsterX = Math.floor(Math.random() * 5000) + 100;
       var randomMonsterY = Math.floor(Math.random() * 700) + 1;
       flappyMonsters.push(new FlappyMonster(randomMonsterX, randomMonsterY, flappyMonsterImg));
     }
-
+    // Randomly generate flappy dragons
     for(var i = 0; i < 30; i++)
     {
       var randomDragonX = Math.floor(Math.random() * 27000) + 5000;
       var randomDragonY = Math.floor(Math.random() * 700) + 1;
       flappyDragons.push(new FlappyDragon(randomDragonX, randomDragonY, flappyDragonImg));
     }
-
-    for(var i = 0; i < 10; i++)
+    // Randomly generate skulls
+    for(var i = 0; i < 20; i++)
     {
       var randomSkullX = Math.floor(Math.random() * 10000) + 200;
       var randomSkullY = Math.floor(Math.random() * 1000) + 1;
       skulls.push(new Skull(randomSkullX, randomSkullY, canvas, skullImg));
     }
-
-    for(var i = 0; i < 10; i++)
+    // Randomly generate flappy grumpys
+    for(var i = 0; i < 20; i++)
     {
       var randomGrumpyX = Math.floor(Math.random() * 20000) + 200;
       var randomGrumpyY = Math.floor(Math.random() * 700) + 1;
       flappyGrumpys.push(new FlappyGrumpy(randomGrumpyX, randomGrumpyY, flappyGrumpyImg));
     }
-
+    // Generate three "boss's"
     flappyBirds.push(new FlappyBird(8000, 0, canvas, flappyBirdImg));
     flappyBirds.push(new FlappyBird(8000, 400, canvas, flappyBirdImg));
     flappyBirds.push(new FlappyBird(9000, 400, canvas, flappyBirdImg));
   }
-
+  // Add powerups
   powerUps.push(new Powerup(50,50));
   powerUps.push(new Powerup(1000,50));
   powerUps.push(new Powerup(2000,50));
   powerUps.push(new Powerup(3000,50));
   powerUps.push(new Powerup(4000,50));
-
+  powerUps.push(new Powerup(5000,50));
+  powerUps.push(new Powerup(6000,50));
+  powerUps.push(new Powerup(7000,50));
+  powerUps.push(new Powerup(8000,50));
+  powerUps.push(new Powerup(9000,50));  
 }
-init();
+init(); // Create level 1
 
 /**
  * @function masterLoop
@@ -468,10 +476,12 @@ function update(elapsedTime) {
     init();
   }
   // Check if game win
-  else if(camera.position.x > 10000 && level == 3)
+  else if(camera.position.x > 9000 && level == 3 && !gameOverCheck)
   {
+    winCheck = true;
     console.log("YOU WIN!");
   }
+  updateWin();  // Check if game win
 
   // Check for game over
   if(player.lives < 1)
@@ -486,11 +496,13 @@ function update(elapsedTime) {
     document.getElementById('level').innerHTML = "LEVEL: " + level;
     document.getElementById('score-under-level').innerHTML = "ENEMIES KILLED: " + enemiesKilled;
   }
+  // Make it black if it is against a white background
   else if(camera.position.x > 0  && camera.position.x < 500 && (level == 3))
   {
     document.getElementById('level-black').innerHTML = "LEVEL: " + level;
     document.getElementById('score-under-level-black').innerHTML = "ENEMIES KILLED: " + enemiesKilled;
   }
+  // Get rid of the current level HTML
   else
   {
     document.getElementById('level').innerHTML = "";
@@ -498,23 +510,20 @@ function update(elapsedTime) {
     document.getElementById('level-black').innerHTML = "";
     document.getElementById('score-under-level-black').innerHTML = "";
   }
-  document.getElementById('score').innerHTML = "SCORE: " + enemiesKilled;
-  document.getElementById('lives').innerHTML = "HEALTH: " + player.lives;
 
-
-  // Update bullets
+  // Update bullet pool
   bullets.update(elapsedTime, function(bullet){
     if(!camera.onScreen(bullet)) return true;
     return false;
   });
 
-  // Update missiles
+  // Update missile pool
   missiles.update(elapsedTime, function(missile){
     if(!camera.onScreen(missile)) return true;
     return false;
   });
 
-  // Update the power up
+  // Update the power ups
   powerUps.forEach(function(power){
     power.update(elapsedTime);
     if(checkCollision(player, power))
@@ -542,11 +551,9 @@ function update(elapsedTime) {
     }
   });
 
-
   /********************************************/
   /*********** FLAPPY MONSTERS ****************/
   /********************************************/
-
 
   flappyMonsters.forEach(function(monster){
     monster.update(elapsedTime);
@@ -555,9 +562,7 @@ function update(elapsedTime) {
     {
       monster.collidedWithPlayer = true;
       player.lives--;
-      // player.state = "hit";
       player.frame = "frame-10";
-      // player.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
       var audio = new Audio('assets/sounds/player_hurt.wav'); // Created with http://www.bfxr.net/
       audio.play();
     }
@@ -568,6 +573,8 @@ function update(elapsedTime) {
         monster.collidedWithPlayer = true;
         monster.health--;
         initiatedBullet = false;
+        var audio = new Audio('assets/sounds/enemy_hurt.wav'); // Created with http://www.bfxr.net/
+        audio.play();
         // Remove the bullets 
         bullets.update(elapsedTime, function(bullet){
           return true;
@@ -596,11 +603,9 @@ function update(elapsedTime) {
     }
   });
 
-
   /********************************************/
   /*********** FLAPPY SKULLS ******************/
   /********************************************/
-
 
   // Update the flappy skulls
   skulls.forEach(function(skull){
@@ -611,9 +616,7 @@ function update(elapsedTime) {
       skull.collidedWithPlayer = true;
       skull.state = "hit";
       skull.img.src = 'assets/enemies/skull/hit/frame.png';
-      // player.state = "hit";
       player.frame = "frame-10";
-      // player.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
       player.lives--;
       var audio = new Audio('assets/sounds/player_hurt.wav'); // Created with http://www.bfxr.net/
       audio.play();
@@ -657,16 +660,13 @@ function update(elapsedTime) {
   /*********** FLAPPY DRAGONS *****************/
   /********************************************/
 
-
   // Update the flappy dragons
   flappyDragons.forEach(function(dragon){
     dragon.update(elapsedTime);
     if(checkCollision(player, dragon) && !dragon.collidedWithPlayer)
     {
       dragon.collidedWithPlayer = true;
-      // player.state = "hit";
       player.frame = "frame-10";
-      // player.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
       player.lives--;
       var audio = new Audio('assets/sounds/player_hurt.wav'); // Created with http://www.bfxr.net/
       audio.play();
@@ -715,7 +715,6 @@ function update(elapsedTime) {
     if(checkCollision(player, grumpy) && !grumpy.collidedWithPlayer)
     {
       grumpy.collidedWithPlayer = true;
-      // player.state = "hit";
       player.frame = "frame-10";
       player.lives--;
       var audio = new Audio('assets/sounds/player_hurt.wav'); // Created with http://www.bfxr.net/
@@ -724,6 +723,8 @@ function update(elapsedTime) {
     for(var i = 0; i < bullets.pool.length; i+=4) {
       if(enemyAndBulletCollision(grumpy, bullets, i, 2) && initiatedBullet)
       {
+        var audio = new Audio('assets/sounds/player_hurt.wav'); // Created with http://www.bfxr.net/
+        audio.play();
         grumpy.health--;
         initiatedBullet = false;
         bullets.update(elapsedTime, function(bullet){
@@ -738,8 +739,7 @@ function update(elapsedTime) {
         grumpy.health -= 2; 
         initiatedMissile = false;
         console.log("Missile collision!");
-
-        // Remove the bullets (TO DO: fix this so it only removes one)
+        // Remove the bullets 
         missiles.update(elapsedTime, function(missile){
           return true;
         });
@@ -755,21 +755,19 @@ function update(elapsedTime) {
     }
   });
 
-
   /********************************************/
   /*********** FLAPPY BIRDS   *****************/
   /********************************************/
-
 
   // Update the flappy birds
   flappyBirds.forEach(function(bird){
     bird.update(elapsedTime);
     if(checkCollision(player, bird) && !bird.collidedWithPlayer)
     {
+      var audio = new Audio('assets/sounds/player_hurt.wav'); // Created with http://www.bfxr.net/
+      audio.play();
       bird.collidedWithPlayer = true;
-      // player.state = "hit";
       player.frame = "frame-10";
-      // player.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
       bird.state = "hit";
       bird.frame = "frame-5";
       bird.img.src = 'assets/enemies/flappy-bird/hit/frame-2.png';
@@ -795,7 +793,7 @@ function update(elapsedTime) {
         bird.health -= 2;
         console.log("Missile collision!");
         initiatedMissile = false;
-        // Remove the bullets (TO DO: fix this so it only removes one)
+        // Remove the bullets 
         missiles.update(elapsedTime, function(missile){
           return true;
         });
@@ -828,8 +826,7 @@ function update(elapsedTime) {
   * @param {CanvasRenderingContext2D} ctx the context to render to
   */
 function render(elapsedTime, ctx) {
-
-  // TODO: Render background
+  // Render the background
   if(level == 1)
   {
     ctx.save();
@@ -984,12 +981,26 @@ function renderWorld(elapsedTime, ctx, camera) {
   */
 function renderGUI(elapsedTime, ctx) {
   // TODO: Render the GUI
+  // Score
+  ctx.fillStyle = "rgb(250, 250, 250)";
+  ctx.font = "24px Helvetica";
+  ctx.textAlign = "left";
+  ctx.textBaseline = "top";
+  ctx.fillText("Score: " + enemiesKilled, 32, 32);
+
+  // Lives
+  ctx.fillStyle = "rgb(250, 250, 250)";
+  ctx.font = "24px Helvetica";
+  ctx.textAlign = "left";
+  ctx.textBaseline = "bottom";
+  ctx.fillText("Lives: " + player.lives, 32, 32);
   
 }
 
 /**
   * @function checkCollisions
   * Checks for a collision by drawing a box around the shape
+  * Used between a player and an enemy
   * @param {a} the first object
   * @param {b} the second object
   * @return false if no collision, true if collision
@@ -1047,6 +1058,10 @@ function enemyAndMissileCollision(rect, missile, index, missileWidth, missileHei
     rect.position.y + rect.height > missile.pool[index+1];
 }
 
+/**
+  * @function reinitializeEnemies
+  * Resets the enemies if player advances to a new level
+  */
 function reinitializeEnemies()
 {
   flappyMonsters = [];
@@ -1056,14 +1071,60 @@ function reinitializeEnemies()
   flappyBirds = [];
 }
 
-function gameOver(player, flag)
+/**
+  * @function gameOver
+  * Causes player to explode, makes a sound, and renders 
+  * an HTML overlay if the player ran out of lives.
+  * @param {object} player the
+  * player who just died.
+  */
+function gameOver(player)
 {
   console.log("GAME OVER!");
   explosions.push(new Explosion(player.position.x + 3, player.position.y + 3));
   var audio = new Audio('assets/sounds/explosion.wav'); // Created with http://www.bfxr.net/
   audio.play();
-  document.getElementById('game-over').innerHTML = "GAME OVER";
-  document.getElementById('continue').innerHTML = "Press any key to continue";
+  if(level == 3)
+  {
+    document.getElementById('game-over-black').innerHTML = "GAME OVER";
+    document.getElementById('continue-black').innerHTML = "Press any key to continue";
+  }
+  else
+  {
+    document.getElementById('game-over').innerHTML = "GAME OVER";
+    document.getElementById('continue').innerHTML = "Press any key to continue";
+  }
   gameOverCheck = true;
   reinitializeEnemies();
+}
+
+/**
+  * @function updateWin
+  * Check if the player won the game
+  * If the player won, create a pop up that tells them they won
+  */
+function updateWin()
+{
+  // Get the modal
+  var modal = document.getElementById('winModal'); 
+  if(winCheck)
+  {
+    modal.style.display = "block";
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function() {
+        modal.display = "none";
+    }
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+  }
+  else
+  {
+    modal.style.display = "none";
+  }
 }

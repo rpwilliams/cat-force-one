@@ -32,6 +32,11 @@ var bullets = new BulletPool(20);
 var missiles = new MissilePool(10);
 var player;
 
+/* Music */
+var level1Music;
+var level2Music;
+var level3Music;
+
 /* Enemies */
 var flappyMonsters = [];
 var skulls = [];
@@ -52,6 +57,7 @@ var shoot = false;
 var missileShoot = false;
 
 /* Other */
+var winCheck = false;
 var gameOverCheck = false;
 var explosions = [];
 var powerUps = [];
@@ -142,7 +148,7 @@ window.onkeydown = function(event) {
       {
         if(!shoot)
         {
-          bullets.color = "yellow";
+          bullets.color = "blue";
           shoot = true;
           console.log("Pew pew!");
           var audio = new Audio('assets/sounds/weapon-3.wav'); // Created with http://www.bfxr.net/
@@ -173,9 +179,12 @@ window.onkeypress=function(event) {
   {
     level = 1;
     score = 0;
+    winCheck = false;
     init();
     document.getElementById('game-over').innerHTML = "";
     document.getElementById('continue').innerHTML = "";
+    document.getElementById('game-over-black').innerHTML = "";
+    document.getElementById('continue-black').innerHTML = "";
     gameOverCheck = false;
   }  
 }
@@ -213,6 +222,7 @@ window.onkeyup = function(event) {
   }
 }
 
+
 /**
  * @function init
  * Initializes the game
@@ -225,7 +235,10 @@ function init()
     /*
     All images are public domain and from opengameart.org
     */
-
+    // http://www.dl-sounds.com/royalty-free/star-commander1/
+    level1Music = new Audio('assets/music/level-1-music.wav');
+    level1Music.play();
+  
     // Load the background images
     backgrounds[0].src = 'assets/backgrounds/city-foreground-extended.png';
     backgrounds[1].src = 'assets/backgrounds/city-background-extended.png';
@@ -241,7 +254,6 @@ function init()
     // Level 3 Background
     backgrounds[6].src = 'assets/backgrounds/graveyard-background-extended.png';
     backgrounds[7].src = 'assets/backgrounds/layer-2.png';
-
 
     // Load the player (cat) images
     playerImg[0] = new Image();
@@ -358,6 +370,11 @@ function init()
     reinitializeEnemies();
     player.lives = 5;
 
+    // http://www.dl-sounds.com/royalty-free/fantasy-island/
+    level1Music.pause();
+    level2Music = new Audio('assets/music/level-2-music.mp3');  
+    level2Music.play();
+
     for(var i = 0; i < 30; i++)
     {
       var randomMonsterX = Math.floor(Math.random() * 5000) + 0;
@@ -365,7 +382,7 @@ function init()
       flappyMonsters.push(new FlappyMonster(randomMonsterX, randomMonsterY, flappyMonsterImg));
     }
 
-    for(var i = 0; i < 50; i++)
+    for(var i = 0; i < 75; i++)
     {
       var randomDragonX = Math.floor(Math.random() * 27000) + 1000;
       var randomDragonY = Math.floor(Math.random() * 700) + 1;
@@ -374,13 +391,18 @@ function init()
   }
   else if(level == 3)
   {
-    player = new Player(bullets, missiles, "weapon-1", playerImg);
+    player = new Player(bullets, missiles, "weapon-2", playerImg);
     camera = new Camera(canvas);
     reinitializeEnemies();
     player.lives = 5;
     bullets.color = "black";
 
-    for(var i = 0; i < 15; i++)
+    // http://www.dl-sounds.com/royalty-free/discotek-loop/
+    level2Music.pause();
+    level3Music = new Audio('assets/music/level-3-music.wav');
+    level3Music.play();
+  
+    for(var i = 0; i < 30; i++)
     {
       var randomMonsterX = Math.floor(Math.random() * 5000) + 100;
       var randomMonsterY = Math.floor(Math.random() * 700) + 1;
@@ -394,14 +416,14 @@ function init()
       flappyDragons.push(new FlappyDragon(randomDragonX, randomDragonY, flappyDragonImg));
     }
 
-    for(var i = 0; i < 10; i++)
+    for(var i = 0; i < 20; i++)
     {
       var randomSkullX = Math.floor(Math.random() * 10000) + 200;
       var randomSkullY = Math.floor(Math.random() * 1000) + 1;
       skulls.push(new Skull(randomSkullX, randomSkullY, canvas, skullImg));
     }
 
-    for(var i = 0; i < 10; i++)
+    for(var i = 0; i < 20; i++)
     {
       var randomGrumpyX = Math.floor(Math.random() * 20000) + 200;
       var randomGrumpyY = Math.floor(Math.random() * 700) + 1;
@@ -418,7 +440,13 @@ function init()
   powerUps.push(new Powerup(2000,50));
   powerUps.push(new Powerup(3000,50));
   powerUps.push(new Powerup(4000,50));
+  powerUps.push(new Powerup(5000,50));
+  powerUps.push(new Powerup(6000,50));
+  powerUps.push(new Powerup(7000,50));
+  powerUps.push(new Powerup(8000,50));
+  powerUps.push(new Powerup(9000,50));
 
+  
 }
 init();
 
@@ -469,10 +497,12 @@ function update(elapsedTime) {
     init();
   }
   // Check if game win
-  else if(camera.position.x > 10000 && level == 3)
+  else if(camera.position.x > 9000 && level == 3 && !gameOverCheck)
   {
+    winCheck = true;
     console.log("YOU WIN!");
   }
+  updateWin();
 
   // Check for game over
   if(player.lives < 1)
@@ -499,8 +529,6 @@ function update(elapsedTime) {
     document.getElementById('level-black').innerHTML = "";
     document.getElementById('score-under-level-black').innerHTML = "";
   }
-  document.getElementById('score').innerHTML = "SCORE: " + enemiesKilled;
-  document.getElementById('lives').innerHTML = "HEALTH: " + player.lives;
 
 
   // Update bullets
@@ -569,6 +597,8 @@ function update(elapsedTime) {
         monster.collidedWithPlayer = true;
         monster.health--;
         initiatedBullet = false;
+        var audio = new Audio('assets/sounds/enemy_hurt.wav'); // Created with http://www.bfxr.net/
+        audio.play();
         // Remove the bullets 
         bullets.update(elapsedTime, function(bullet){
           return true;
@@ -725,6 +755,8 @@ function update(elapsedTime) {
     for(var i = 0; i < bullets.pool.length; i+=4) {
       if(enemyAndBulletCollision(grumpy, bullets, i, 2) && initiatedBullet)
       {
+        var audio = new Audio('assets/sounds/player_hurt.wav'); // Created with http://www.bfxr.net/
+        audio.play();
         grumpy.health--;
         initiatedBullet = false;
         bullets.update(elapsedTime, function(bullet){
@@ -767,6 +799,8 @@ function update(elapsedTime) {
     bird.update(elapsedTime);
     if(checkCollision(player, bird) && !bird.collidedWithPlayer)
     {
+      var audio = new Audio('assets/sounds/player_hurt.wav'); // Created with http://www.bfxr.net/
+      audio.play();
       bird.collidedWithPlayer = true;
       // player.state = "hit";
       player.frame = "frame-10";
@@ -985,6 +1019,19 @@ function renderWorld(elapsedTime, ctx, camera) {
   */
 function renderGUI(elapsedTime, ctx) {
   // TODO: Render the GUI
+  // Score
+  ctx.fillStyle = "rgb(250, 250, 250)";
+  ctx.font = "24px Helvetica";
+  ctx.textAlign = "left";
+  ctx.textBaseline = "top";
+  ctx.fillText("Score: " + enemiesKilled, 32, 32);
+
+  // Lives
+  ctx.fillStyle = "rgb(250, 250, 250)";
+  ctx.font = "24px Helvetica";
+  ctx.textAlign = "left";
+  ctx.textBaseline = "bottom";
+  ctx.fillText("Lives: " + player.lives, 32, 32);
   
 }
 
@@ -1063,10 +1110,45 @@ function gameOver(player, flag)
   explosions.push(new Explosion(player.position.x + 3, player.position.y + 3));
   var audio = new Audio('assets/sounds/explosion.wav'); // Created with http://www.bfxr.net/
   audio.play();
-  document.getElementById('game-over').innerHTML = "GAME OVER";
-  document.getElementById('continue').innerHTML = "Press any key to continue";
+  if(level == 3)
+  {
+    document.getElementById('game-over-black').innerHTML = "GAME OVER";
+    document.getElementById('continue-black').innerHTML = "Press any key to continue";
+  }
+  else
+  {
+    document.getElementById('game-over').innerHTML = "GAME OVER";
+    document.getElementById('continue').innerHTML = "Press any key to continue";
+  }
   gameOverCheck = true;
   reinitializeEnemies();
+}
+
+function updateWin()
+{
+  // Get the modal
+  var modal = document.getElementById('winModal'); 
+  if(winCheck)
+  {
+    modal.style.display = "block";
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function() {
+        modal.display = "none";
+    }
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+  }
+  else
+  {
+    modal.style.display = "none";
+  }
+  
 }
 },{"./bullet_pool":2,"./camera":3,"./flappy-bird":4,"./flappy-dragon":5,"./flappy-grumpy":6,"./flappy-monster":7,"./game":8,"./missile_pool":9,"./particle_explosion":11,"./player":12,"./powerup":13,"./skull":14,"./vector":15}],2:[function(require,module,exports){
 "use strict";
@@ -1215,7 +1297,7 @@ Camera.prototype.update = function(target) {
   }
 
   if(self.position.x < 0) self.position.x = 0;
-  console.log("Camera: (" + self.position.x + "," + self.position.y + ")");
+  // console.log("Camera: (" + self.position.x + "," + self.position.y + ")");
 }
 
 /**
@@ -1645,7 +1727,7 @@ function FlappyMonster(xPos, yPos, img) {
   this.width = 64;
   this.active = true;
   this.collidedWithPlayer = false; // Don't allow duplicate collisions
-  this.health = 2;
+  this.health = 1;
 
   var self = this;
   self.animate = function(time)
@@ -2146,6 +2228,7 @@ function Player(bullets, missiles, weapon, img) {
  * boolean properties: up, left, right, down
  */
 Player.prototype.update = function(elapsedTime, input) {
+  console.log("Player y: " + this.position.y);
   this.animate(elapsedTime);
   
   // set the velocity
@@ -2163,8 +2246,8 @@ Player.prototype.update = function(elapsedTime, input) {
   
   // don't let the player move off-screen
   if(this.position.x < 0) this.position.x = 200;
-  //if(this.position.x > 1024) this.position.x = 1024;
-  //if(this.position.y > 786) this.position.y = 786;  
+  if(this.position.y > 700) this.position.y = 700;  
+  if(this.position.y < 0) this.position.y = 0;  
 }
 
 /**

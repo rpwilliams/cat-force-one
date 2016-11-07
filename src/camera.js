@@ -43,7 +43,7 @@ Camera.prototype.update = function(target) {
   }
 
   if(self.position.x < 0) self.position.x = 0;
-  console.log("Camera: (" + self.position.x + "," + self.position.y + ")");
+  // console.log("Camera: (" + self.position.x + "," + self.position.y + ")");
 }
 
 /**

@@ -111,6 +111,7 @@ function Player(bullets, missiles, weapon, img) {
  * boolean properties: up, left, right, down
  */
 Player.prototype.update = function(elapsedTime, input) {
+  console.log("Player y: " + this.position.y);
   this.animate(elapsedTime);
   
   // set the velocity
@@ -128,8 +129,8 @@ Player.prototype.update = function(elapsedTime, input) {
   
   // don't let the player move off-screen
   if(this.position.x < 0) this.position.x = 200;
-  //if(this.position.x > 1024) this.position.x = 1024;
-  //if(this.position.y > 786) this.position.y = 786;  
+  if(this.position.y > 700) this.position.y = 700;  
+  if(this.position.y < 0) this.position.y = 0;  
 }
 
 /**

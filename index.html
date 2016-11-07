@@ -2,18 +2,45 @@
 <html>
   <head>
     <title>Scrolling Shooter</title>
+    <img src='assets/frame-1.png' class="cat-img "></img>
+    <img src="assets/cat.png" class="cat "></img>
+    <img src="assets/force.png" class="force "></img>
+    <img src="assets/one.png" class="one "></img>
     <link type="text/css" rel="stylesheet" href="game.css" />
   </head>
   <body bgcolor="#E8E8E8">
+  <h2>Instructions:</h2> Use the arrow keys to move up and down.
+  <p> Use the space bar to shoot.</p>
+  <p> How many enemies can you defeat in all 3 levels? </p>
+  <h2>Credits:</h2>
+  <p>Logo Made with <a href="http://logomakr.com" title="Logo Maker">Logo Maker.</a></p>
+  <p>All backgrounds, sounds, music, characters </p> 
+  <p> and animations are used under the public domain license.</p>
+  <p>Developed by <a href="http://www.RyanPaulWilliams.com" title="Ryan Williams">Ryan Williams.</a></p>
+  <p><a href = "http://www.github.com/rpwilliams">Click here for source code.</a></p>
+  <img src='assets/frame-2.png' class="cat-img-2"></img>
     <canvas id="screen" width="1024" height="786" class = "middle"></canvas>
     <div id = "level" class = "middle level-text"></div>
     <div id = "level-black" style="color:black" class = "middle level-text"></div>
     <div id = "score-under-level-black" style="color:black"  class = "middle-score score-under-level-text"></div>
     <div id = "score-under-level"  class = "middle-score score-under-level-text"></div>
-    <div id = "score" style="color:black" class = "score score-lives-text">Score:</div>
-    <div id = "lives" style="color:black" class = "lives score-lives-text">Lives:</div>
     <div id = "game-over" class = "game-over level-text"></div>
+    <div id = "game-over-black" style="color:black" class = "game-over level-text"></div>
     <div id = "continue" class = "middle-score score-under-level-text"></div>
+    <div id = "continue-black" style="color:black" class = "middle-score score-under-level-text"></div>
+    <!-- Modal content -->
+    <div id = "winModal" class="modal-content">
+      <div class="modal-header">
+        <span class="close">×</span>
+        <h2>YOU WIN!</h2>
+      </div>
+      <div class="modal-body">
+        <img src = 'assets/gifs/flappy-bird/got-hit.gif' />
+      </div>
+      <div class="modal-footer">
+        <h3>Refresh this page to play again.</h3>
+      </div>
+    </div>
     <script type="text/javascript" src="bundle.js"></script>
   </body>
 </html>
