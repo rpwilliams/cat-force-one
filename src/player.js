@@ -121,7 +121,7 @@ Player.prototype.update = function(elapsedTime, input) {
   // move the player
   this.position.x += this.velocity.x;
   this.position.y += this.velocity.y;
-
+  
   // don't let the player move off-screen
   if(this.position.x < 0) this.position.x = 200;
   //if(this.position.x > 1024) this.position.x = 1024;

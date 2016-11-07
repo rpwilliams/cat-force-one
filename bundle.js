@@ -14,6 +14,7 @@ const FlappyDragon = require('./flappy-dragon');
 const FlappyGrumpy = require('./flappy-grumpy');
 const FlappyBird = require('./flappy-bird');
 const Powerup = require('./powerup');
+const Explosion = require('./particle_explosion')
 
 /* Global variables */
 var canvas = document.getElementById('screen');
@@ -51,6 +52,7 @@ var shoot = false;
 var missileShoot = false;
 
 /* Other */
+var explosions = [];
 var powerUps = [];
 var score = 0;
 var backgrounds = [
@@ -378,10 +380,6 @@ function init()
   
 }
 init();
-level = 2;
-init();
-level = 3;
-init();
 
 /**
  * @function masterLoop
@@ -409,6 +407,11 @@ function update(elapsedTime) {
   // update the camera
   camera.update(player);
 
+  // update the explosions
+  explosions.forEach(function(explosion){
+    explosion.update(elapsedTime);
+  })
+
   // Check if reached level 2
   if(player.position.x > 5000 && level == 1)
   {
@@ -423,11 +426,19 @@ function update(elapsedTime) {
     level = 3;
     init();
   }
+  // Check if game win
+  else if(camera.position.x > 10000 && level == 3)
+  {
+    console.log("YOU WIN!");
+  }
 
   // Check for game over
   if(player.lives < 1)
   {
     console.log("GAME OVER!");
+    explosions.push(new Explosion(player.position.x + 3, player.position.y + 3));
+    player.position.x = -90000;
+    player.position.y = -90000;
     gameOver = true;
   }
 
@@ -446,7 +457,7 @@ function update(elapsedTime) {
   {
     document.getElementById('level').innerHTML = "";
     document.getElementById('score-under-level').innerHTML = "";
-     document.getElementById('level-black').innerHTML = "";
+    document.getElementById('level-black').innerHTML = "";
     document.getElementById('score-under-level-black').innerHTML = "";
   }
   document.getElementById('score').innerHTML = "SCORE: " + enemiesKilled;
@@ -538,6 +549,7 @@ function update(elapsedTime) {
     {
       enemiesKilled++;
       monster.active = false;
+      explosions.push(new Explosion(monster.position.x + 2.5, monster.position.y));
     }
   });
 
@@ -589,6 +601,7 @@ function update(elapsedTime) {
     {
       enemiesKilled++;
       skull.active = false;
+      explosions.push(new Explosion(skull.position.x, skull.position.y));
     }
   });
 
@@ -636,6 +649,7 @@ function update(elapsedTime) {
     {
       enemiesKilled++;
       dragon.active = false;
+      explosions.push(new Explosion(dragon.position.x - 5, dragon.position.y));
     }
   });
 
@@ -681,6 +695,7 @@ function update(elapsedTime) {
     {
       enemiesKilled++;
       grumpy.active = false;
+      explosions.push(new Explosion(grumpy.position.x - 2, grumpy.position.y));
     }
   });
 
@@ -703,6 +718,7 @@ function update(elapsedTime) {
       bird.frame = "frame-5";
       bird.img.src = 'assets/enemies/flappy-bird/hit/frame-2.png';
       player.lives--;
+      explosions.push(new Explosion(player.position.x, player.position.y));
     }
     // Check for bullet collisions
     for(var i = 0; i < bullets.pool.length; i+=4) {
@@ -731,6 +747,7 @@ function update(elapsedTime) {
     {
       enemiesKilled++;
       bird.active = false;
+      explosions.push(new Explosion(bird.position.x, bird.position.y));
     }
   });
 
@@ -853,44 +870,50 @@ function render(elapsedTime, ctx) {
   */
 function renderWorld(elapsedTime, ctx, camera) {
 
-    // Render the bullets
-    bullets.render(elapsedTime, ctx);
+  // Render the bullets
+  bullets.render(elapsedTime, ctx);
 
-    // Render the missiles
-    missiles.render(elapsedTime, ctx);
-   
-    // Render the player
-    player.render(elapsedTime, ctx, camera);
+  // Render the missiles
+  missiles.render(elapsedTime, ctx);
 
-    // Render the power up
-    powerUps.forEach(function(powerup){
-      powerup.render(elapsedTime, ctx);
-    });
+  // Render the player
+  player.render(elapsedTime, ctx, camera);
 
-    // Render the flappy monsters
-    flappyMonsters.forEach(function(FlappyMonster){
-      FlappyMonster.render(elapsedTime, ctx);
-    });
+  // Render the power up
+  powerUps.forEach(function(powerup){
+    powerup.render(elapsedTime, ctx);
+  });
 
-    // Render the flappy cats
-    skulls.forEach(function(Skull){
-      Skull.render(elapsedTime, ctx);
-    });
+  // Render the flappy monsters
+  flappyMonsters.forEach(function(FlappyMonster){
+    FlappyMonster.render(elapsedTime, ctx);
+  });
 
-    // Render the flappy dragons
-    flappyDragons.forEach(function(FlappyDragon){
-      FlappyDragon.render(elapsedTime, ctx);
-    });
+  // Render the flappy cats
+  skulls.forEach(function(Skull){
+    Skull.render(elapsedTime, ctx);
+  });
 
-    // Render the flappy grumpys
-    flappyGrumpys.forEach(function(FlappyGrumpy){
-      FlappyGrumpy.render(elapsedTime, ctx);
-    });
+  // Render the flappy dragons
+  flappyDragons.forEach(function(FlappyDragon){
+    FlappyDragon.render(elapsedTime, ctx);
+  });
 
-    // Render the flappy grumpys
-    flappyBirds.forEach(function(FlappyBird){
-      FlappyBird.render(elapsedTime, ctx);
-    });
+  // Render the flappy grumpys
+  flappyGrumpys.forEach(function(FlappyGrumpy){
+    FlappyGrumpy.render(elapsedTime, ctx);
+  });
+
+  // Render the flappy grumpys
+  flappyBirds.forEach(function(FlappyBird){
+    FlappyBird.render(elapsedTime, ctx);
+  });
+
+  // Render the explosions
+  explosions.forEach(function(explosion){
+    explosion.render(elapsedTime, ctx);
+  })
+
 }
 
 /**
@@ -972,7 +995,7 @@ function reinitializeEnemies()
   flappyGrumpys = [];
   flappyBirds = [];
 }
-},{"./bullet_pool":2,"./camera":3,"./flappy-bird":4,"./flappy-dragon":5,"./flappy-grumpy":6,"./flappy-monster":7,"./game":8,"./missile_pool":9,"./player":10,"./powerup":11,"./skull":12,"./vector":13}],2:[function(require,module,exports){
+},{"./bullet_pool":2,"./camera":3,"./flappy-bird":4,"./flappy-dragon":5,"./flappy-grumpy":6,"./flappy-monster":7,"./game":8,"./missile_pool":9,"./particle_explosion":11,"./player":12,"./powerup":13,"./skull":14,"./vector":15}],2:[function(require,module,exports){
 "use strict";
 
 /**
@@ -1157,7 +1180,7 @@ Camera.prototype.toWorldCoordinates = function(screenCoordinates) {
   return Vector.add(screenCoordinates, this);
 }
 
-},{"./vector":13}],4:[function(require,module,exports){
+},{"./vector":15}],4:[function(require,module,exports){
 "use strict";
 
 /* Classes and Libraries */
@@ -1293,7 +1316,7 @@ FlappyBird.prototype.render = function(elapsedTime, ctx) {
 
 
 
-},{"./vector":13}],5:[function(require,module,exports){
+},{"./vector":15}],5:[function(require,module,exports){
 "use strict";
 
 /* Classes and Libraries */
@@ -1392,7 +1415,7 @@ FlappyDragon.prototype.render = function(elapsedTime, ctx) {
 
 
 
-},{"./vector":13}],6:[function(require,module,exports){
+},{"./vector":15}],6:[function(require,module,exports){
 "use strict";
 
 /* Classes and Libraries */
@@ -1514,7 +1537,7 @@ FlappyGrumpy.prototype.render = function(elapsedTime, ctx) {
 
 
 
-},{"./vector":13}],7:[function(require,module,exports){
+},{"./vector":15}],7:[function(require,module,exports){
 "use strict";
 
 /* Classes and Libraries */
@@ -1631,7 +1654,7 @@ FlappyMonster.prototype.render = function(elapsedTime, ctx) {
 
 
 
-},{"./vector":13}],8:[function(require,module,exports){
+},{"./vector":15}],8:[function(require,module,exports){
 "use strict";
 
 /**
@@ -1803,6 +1826,142 @@ MissilePool.prototype.render = function(elapsedTime, ctx) {
 },{}],10:[function(require,module,exports){
 "use strict";
 
+/*
+ * @module Particle
+ * A single explosion particle
+ * Code from http://www.gameplaypassion.com/blog/explosion-effect-html5-canvas/
+ */
+ module.exports = exports = Particle;
+
+function Particle()
+{
+	this.scale = 1.0;
+	this.x = 0;
+	this.y = 0;
+	this.radius = 20;
+	this.color = "#000";
+	this.velocityX = 0;
+	this.velocityY = 0;
+	this.scaleSpeed = 0.5;
+
+	this.update = function(ms)
+	{
+		// shrinking
+		this.scale -= this.scaleSpeed * ms / 1000.0;
+
+		if (this.scale <= 0)
+		{
+			this.scale = 0;
+		}
+		// moving away from explosion center
+		this.x += this.velocityX * ms/1000.0;
+		this.y += this.velocityY * ms/1000.0;
+	};
+}
+
+Particle.prototype.update = function(elapsedTime)
+{
+	// shrinking
+	this.scale -= this.scaleSpeed * elapsedTime / 1000.0;
+
+	if (this.scale <= 0)
+	{
+		this.scale = 0;
+	}
+	// moving away from explosion center
+	this.x += this.velocityX * elapsedTime/1000.0;
+	this.y += this.velocityY * elapsedTime/1000.0;
+}
+
+Particle.prototype.render = function(ctx)
+{
+	// translating the 2D context to the particle coordinates
+	ctx.save();
+	ctx.translate(this.x, this.y);
+	ctx.scale(this.scale, this.scale);
+
+	// drawing a filled circle in the particle's local space
+	ctx.beginPath();
+	ctx.arc(0, 0, this.radius, 0, Math.PI*2, true);
+	ctx.closePath();
+
+	ctx.fillStyle = this.color;
+	ctx.fill();
+
+	ctx.restore();
+}
+},{}],11:[function(require,module,exports){
+"use strict";
+
+module.exports = exports = Explosion;
+
+const Particle = require('./particle');
+
+/* Array of particles (global variable)
+*/
+var particles = [];
+
+/*
+ * Basic Explosion, all particles move and shrink at the same speed.
+ * 
+ * Parameter : explosion center
+ */
+function Explosion(x, y)
+{
+	// creating 4 particles that scatter at 0, 90, 180 and 270 degrees
+	for (var angle=0; angle<360; angle+=90)
+	{
+		var particle = new Particle();
+
+		// particle will start at explosion center
+		particle.x = x;
+		particle.y = y;
+
+		particle.color = "#FF0000";
+
+		var speed = 50.0;
+
+		// velocity is rotated by "angle"
+		particle.velocityX = speed * Math.cos(angle * Math.PI / 180.0);
+		particle.velocityY = speed * Math.sin(angle * Math.PI / 180.0);
+
+		// adding the newly created particle to the "particles" array
+		particles.push(particle);
+	}
+}
+
+Explosion.prototype.update = function(elapsedTime)
+{
+	// draw a white background to clear canvas
+	//ctx.fillStyle = "#FFF";
+	//ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+	// update and draw particles
+	for (var i=0; i<particles.length; i++)
+	{
+		var particle = particles[i];
+
+		particle.update(elapsedTime);
+	}
+}
+
+Explosion.prototype.render = function(elapsedTime, ctx)
+{
+	// draw a white background to clear canvas
+	//ctx.fillStyle = "#FFF";
+	//ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+	// update and draw particles
+	for (var i=0; i<particles.length; i++)
+	{
+		var particle = particles[i];
+
+		particle.render(ctx);
+	}
+}
+},{"./particle":10}],12:[function(require,module,exports){
+"use strict";
+
 /* Classes and Libraries */
 const Vector = require('./vector');
 
@@ -1924,7 +2083,7 @@ Player.prototype.update = function(elapsedTime, input) {
   // move the player
   this.position.x += this.velocity.x;
   this.position.y += this.velocity.y;
-
+  
   // don't let the player move off-screen
   if(this.position.x < 0) this.position.x = 200;
   //if(this.position.x > 1024) this.position.x = 1024;
@@ -2018,7 +2177,7 @@ Player.prototype.fireMissile= function(direction) {
 
 
 
-},{"./vector":13}],11:[function(require,module,exports){
+},{"./vector":15}],13:[function(require,module,exports){
 "use strict";
 
 /**
@@ -2070,7 +2229,7 @@ Powerup.prototype.render = function(elapasedTime, ctx, camera) {
 
 
 
-},{}],12:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 
 /* Classes and Libraries */
@@ -2203,7 +2362,7 @@ Skull.prototype.render = function(elapsedTime, ctx) {
 
 
 
-},{"./vector":13}],13:[function(require,module,exports){
+},{"./vector":15}],15:[function(require,module,exports){
 "use strict";
 
 /**

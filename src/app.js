@@ -13,6 +13,7 @@ const FlappyDragon = require('./flappy-dragon');
 const FlappyGrumpy = require('./flappy-grumpy');
 const FlappyBird = require('./flappy-bird');
 const Powerup = require('./powerup');
+const Explosion = require('./particle_explosion')
 
 /* Global variables */
 var canvas = document.getElementById('screen');
@@ -50,6 +51,7 @@ var shoot = false;
 var missileShoot = false;
 
 /* Other */
+var explosions = [];
 var powerUps = [];
 var score = 0;
 var backgrounds = [
@@ -377,10 +379,6 @@ function init()
   
 }
 init();
-level = 2;
-init();
-level = 3;
-init();
 
 /**
  * @function masterLoop
@@ -408,6 +406,11 @@ function update(elapsedTime) {
   // update the camera
   camera.update(player);
 
+  // update the explosions
+  explosions.forEach(function(explosion){
+    explosion.update(elapsedTime);
+  })
+
   // Check if reached level 2
   if(player.position.x > 5000 && level == 1)
   {
@@ -432,10 +435,11 @@ function update(elapsedTime) {
   if(player.lives < 1)
   {
     console.log("GAME OVER!");
+    explosions.push(new Explosion(player.position.x + 3, player.position.y + 3));
+    player.position.x = -90000;
+    player.position.y = -90000;
     gameOver = true;
   }
-
-
 
   // Display the current level between 0 to 1000 in the x position
   if(camera.position.x > 0  && camera.position.x < 500 && (level == 1 || level == 2))
@@ -452,7 +456,7 @@ function update(elapsedTime) {
   {
     document.getElementById('level').innerHTML = "";
     document.getElementById('score-under-level').innerHTML = "";
-     document.getElementById('level-black').innerHTML = "";
+    document.getElementById('level-black').innerHTML = "";
     document.getElementById('score-under-level-black').innerHTML = "";
   }
   document.getElementById('score').innerHTML = "SCORE: " + enemiesKilled;
@@ -544,6 +548,7 @@ function update(elapsedTime) {
     {
       enemiesKilled++;
       monster.active = false;
+      explosions.push(new Explosion(monster.position.x + 2.5, monster.position.y));
     }
   });
 
@@ -595,6 +600,7 @@ function update(elapsedTime) {
     {
       enemiesKilled++;
       skull.active = false;
+      explosions.push(new Explosion(skull.position.x, skull.position.y));
     }
   });
 
@@ -642,6 +648,7 @@ function update(elapsedTime) {
     {
       enemiesKilled++;
       dragon.active = false;
+      explosions.push(new Explosion(dragon.position.x - 5, dragon.position.y));
     }
   });
 
@@ -687,6 +694,7 @@ function update(elapsedTime) {
     {
       enemiesKilled++;
       grumpy.active = false;
+      explosions.push(new Explosion(grumpy.position.x - 2, grumpy.position.y));
     }
   });
 
@@ -709,6 +717,7 @@ function update(elapsedTime) {
       bird.frame = "frame-5";
       bird.img.src = 'assets/enemies/flappy-bird/hit/frame-2.png';
       player.lives--;
+      explosions.push(new Explosion(player.position.x, player.position.y));
     }
     // Check for bullet collisions
     for(var i = 0; i < bullets.pool.length; i+=4) {
@@ -737,6 +746,7 @@ function update(elapsedTime) {
     {
       enemiesKilled++;
       bird.active = false;
+      explosions.push(new Explosion(bird.position.x, bird.position.y));
     }
   });
 
@@ -859,44 +869,50 @@ function render(elapsedTime, ctx) {
   */
 function renderWorld(elapsedTime, ctx, camera) {
 
-    // Render the bullets
-    bullets.render(elapsedTime, ctx);
+  // Render the bullets
+  bullets.render(elapsedTime, ctx);
 
-    // Render the missiles
-    missiles.render(elapsedTime, ctx);
-   
-    // Render the player
-    player.render(elapsedTime, ctx, camera);
+  // Render the missiles
+  missiles.render(elapsedTime, ctx);
 
-    // Render the power up
-    powerUps.forEach(function(powerup){
-      powerup.render(elapsedTime, ctx);
-    });
+  // Render the player
+  player.render(elapsedTime, ctx, camera);
 
-    // Render the flappy monsters
-    flappyMonsters.forEach(function(FlappyMonster){
-      FlappyMonster.render(elapsedTime, ctx);
-    });
+  // Render the power up
+  powerUps.forEach(function(powerup){
+    powerup.render(elapsedTime, ctx);
+  });
 
-    // Render the flappy cats
-    skulls.forEach(function(Skull){
-      Skull.render(elapsedTime, ctx);
-    });
+  // Render the flappy monsters
+  flappyMonsters.forEach(function(FlappyMonster){
+    FlappyMonster.render(elapsedTime, ctx);
+  });
 
-    // Render the flappy dragons
-    flappyDragons.forEach(function(FlappyDragon){
-      FlappyDragon.render(elapsedTime, ctx);
-    });
+  // Render the flappy cats
+  skulls.forEach(function(Skull){
+    Skull.render(elapsedTime, ctx);
+  });
 
-    // Render the flappy grumpys
-    flappyGrumpys.forEach(function(FlappyGrumpy){
-      FlappyGrumpy.render(elapsedTime, ctx);
-    });
+  // Render the flappy dragons
+  flappyDragons.forEach(function(FlappyDragon){
+    FlappyDragon.render(elapsedTime, ctx);
+  });
 
-    // Render the flappy grumpys
-    flappyBirds.forEach(function(FlappyBird){
-      FlappyBird.render(elapsedTime, ctx);
-    });
+  // Render the flappy grumpys
+  flappyGrumpys.forEach(function(FlappyGrumpy){
+    FlappyGrumpy.render(elapsedTime, ctx);
+  });
+
+  // Render the flappy grumpys
+  flappyBirds.forEach(function(FlappyBird){
+    FlappyBird.render(elapsedTime, ctx);
+  });
+
+  // Render the explosions
+  explosions.forEach(function(explosion){
+    explosion.render(elapsedTime, ctx);
+  })
+
 }
 
 /**
