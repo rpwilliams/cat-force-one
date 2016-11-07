@@ -20,6 +20,7 @@ function BulletPool(maxSize) {
   this.pool = new Float32Array(4 * maxSize);
   this.end = 0;
   this.max = maxSize;
+  this.color = "white";
 }
 
 /**
@@ -75,6 +76,7 @@ BulletPool.prototype.update = function(elapsedTime, callback) {
       i--;
     }
   }
+  this.color = this.color;
 }
 
 /**
@@ -87,7 +89,7 @@ BulletPool.prototype.render = function(elapsedTime, ctx) {
   // Render the bullets as a single path
   ctx.save();
   ctx.beginPath();
-  ctx.fillStyle = "white";
+  ctx.fillStyle = this.color;
   for(var i = 0; i < this.end; i++) {
     ctx.moveTo(this.pool[4*i], this.pool[4*i+1]);
     ctx.arc(this.pool[4*i], this.pool[4*i+1], 2, 0, 2*Math.PI);

@@ -5,7 +5,7 @@ const Vector = require('./vector');
 //const Missile = require('./missile');
 
 /* Constants */
-const PLAYER_SPEED = -.5;
+const PLAYER_SPEED = -.25;
 const MS_PER_FRAME = 1000/8;
 
 /**
@@ -37,6 +37,8 @@ function FlappyBird(xPos, yPos, canvas, img) {
   this.initialAcceleration = true; 
   this.active = true;
   this.img = img[0];
+  this.collidedWithPlayer = false;  // Don't allow duplicate collisions
+  this.health = 5;
 
   var self = this;
   self.animate = function(time)

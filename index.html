@@ -4,10 +4,14 @@
     <title>Scrolling Shooter</title>
     <link type="text/css" rel="stylesheet" href="game.css" />
   </head>
-  <body>
-    <h1>Play Scrolling Shooter</h1>
-    <canvas id="screen" width="1024" height="786"></canvas>
-    <h2>Instructions</h2>
+  <body bgcolor="#E8E8E8">
+    <canvas id="screen" width="1024" height="786" class = "middle"></canvas>
+    <div id = "level" class = "middle level-text"></div>
+    <div id = "level-black" style="color:black" class = "middle level-text"></div>
+    <div id = "score-under-level-black" style="color:black"  class = "middle-score score-under-level-text"></div>
+    <div id = "score-under-level"  class = "middle-score score-under-level-text"></div>
+    <div id = "score" style="color:black" class = "score score-lives-text">Score:</div>
+    <div id = "lives" style="color:black" class = "lives score-lives-text">Lives:</div>
     <script type="text/javascript" src="bundle.js"></script>
   </body>
 </html>

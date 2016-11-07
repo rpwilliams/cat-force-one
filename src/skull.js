@@ -35,6 +35,8 @@ function Skull(xPos, yPos, canvas, img) {
   this.width = 64;
   this.initialAcceleration = true; 
   this.active = true;
+  this.collidedWithPlayer = false; // Don't allow duplicate collisions
+  this.health = 1;
 
   var self = this;
   self.animate = function(time)

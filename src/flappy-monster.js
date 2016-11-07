@@ -5,7 +5,7 @@ const Vector = require('./vector');
 //const Missile = require('./missile');
 
 /* Constants */
-const PLAYER_SPEED = 1;
+const PLAYER_SPEED = 2.5;
 const MS_PER_FRAME = 1000/8;
 
 /**
@@ -31,6 +31,8 @@ function FlappyMonster(xPos, yPos, img) {
   this.height = 64;
   this.width = 64;
   this.active = true;
+  this.collidedWithPlayer = false; // Don't allow duplicate collisions
+  this.health = 2;
 
   var self = this;
   self.animate = function(time)

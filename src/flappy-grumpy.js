@@ -31,6 +31,8 @@ function FlappyGrumpy(xPos, yPos, img) {
   this.height = 64;
   this.width = 64;
   this.active = true;
+  this.collidedWithPlayer = false; // Don't allow duplicate collisions
+  this.health = 1;
 
   var self = this;
   self.animate = function(time)

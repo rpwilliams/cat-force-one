@@ -4,19 +4,10 @@
 const Vector = require('./vector');
 
 /* Constants */
-const PLAYER_SPEED = 5;
+const PLAYER_SPEED = 3;
 const BULLET_SPEED = 10;
-const MISSILE_SPEED = 5;
+const MISSILE_SPEED = 10;
 const MS_PER_FRAME = 1000/8;
-
-// var img1 = 'assets/enemies/flappy-cat/flying/frame-1.png';
-// var img2 = 'assets/enemies/flappy-cat/flying/frame-2.png';
-// var img3 = 'assets/enemies/flappy-cat/flying/frame-3.png';
-// var img4 = 'assets/enemies/flappy-cat/flying/frame-4.png';
-// var img5 = 'assets/enemies/flappy-cat/flying/frame-5.png';
-// var img6 = 'assets/enemies/flappy-cat/flying/frame-6.png';
-// var img7 = 'assets/enemies/flappy-cat/flying/frame-7.png';
-// var img8 = 'assets/enemies/flappy-cat/flying/frame-8.png';
 
 /**
  * @module Player
@@ -36,8 +27,6 @@ function Player(bullets, missiles, weapon, img) {
   this.angle = 0;
   this.position = {x: 200, y: 200};
   this.velocity = {x: 0, y: 0};
-  //this.img = new Image()
-  //this.img.src = 'assets/player/flappy-cat/flying/frame-1.png';
   this.width = 64 + (64 * .5);
   this.height = 64 + (64 * .5);
   this.state = "flying";
@@ -45,7 +34,7 @@ function Player(bullets, missiles, weapon, img) {
   this.frame = 'frame-1';
   this.weapon = weapon;
   this.img = img[0];
-  this.lives = 3;
+  this.lives = 5;
 
   var self = this;
   self.animate = function(time)
@@ -118,23 +107,16 @@ function Player(bullets, missiles, weapon, img) {
  * boolean properties: up, left, right, down
  */
 Player.prototype.update = function(elapsedTime, input) {
-  var self = this;
-  self.animate(elapsedTime);
-
-  //this.weapon = this.weapon;
+  this.animate(elapsedTime);
   
   // set the velocity
   this.velocity.x = 0;
-  if(input.left) this.velocity.x -= PLAYER_SPEED;
-  if(input.right) this.velocity.x += PLAYER_SPEED;
+  // if(input.left) this.velocity.x -= PLAYER_SPEED;
+  // if(input.right) this.velocity.x += PLAYER_SPEED;
+  this.velocity.x += PLAYER_SPEED;
   this.velocity.y = 0;
-  if(input.up) this.velocity.y -= PLAYER_SPEED;
-  if(input.down) this.velocity.y += PLAYER_SPEED;
-
-  // determine player angle
-  // this.angle = 0;
-  // if(this.velocity.x < 0) this.angle = -1;
-  // if(this.velocity.x > 0) this.angle = 1;
+  if(input.up) this.velocity.y -= PLAYER_SPEED * 2;
+  if(input.down) this.velocity.y += PLAYER_SPEED * 2;
 
   // move the player
   this.position.x += this.velocity.x;

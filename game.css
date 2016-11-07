@@ -1,6 +1,63 @@
 canvas#screen {
   cursor: none;
   border: 2px solid #333;
-  box-shadow: 4px 4px 4px #777;
-  position: relative;
+  position: absolute;
+  top: 10%;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
 }
+
+.middle {
+  position: absolute;
+  margin: auto;
+  top: 50%;
+  right: 44%;
+  bottom: 50%;
+}
+
+.middle-score {
+  position: absolute;
+  margin: auto;
+  top: 45%;
+  right: 44%;
+  bottom: 50%;
+}
+
+.level-text
+{
+  font-family: calibri;
+  font-size:80px;
+  color: #ffffff;
+}
+
+.score-under-level-text
+{
+  font-family: calibri;
+  font-size:40px;
+  color: #ffffff;
+}
+
+.score-lives-text
+{
+  font-family: calibri;
+  font-size:60px;
+  color: #000000;
+}
+
+.score {
+  position: absolute;
+  margin: auto;
+  bottom: 85%;
+  right: 85%;
+}
+
+.lives {
+  position: absolute;
+  top: 15%;
+  right: 85%;
+
+  margin: auto;
+}
+
