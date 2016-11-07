@@ -79,22 +79,26 @@ function Player(bullets, missiles, weapon, img) {
             self.frame = 'frame-1';
             self.img = img[7];
             break;
-        }
-      }
-      else
-      {
-        switch(self.frame)
-        {
-          case 'frame-9':
-            self.frame = 'frame-10';
-            self.img = img[8];
-            break;
           case 'frame-10':
-            self.frame = 'frame-9';
+            self.frame = 'frame-1';
             self.img = img[9];
             break;
         }
       }
+      // else
+      // {
+      //   switch(self.frame)
+      //   {
+      //     case 'frame-9':
+      //       self.frame = 'frame-10';
+      //       self.img = img[8];
+      //       break;
+      //     case 'frame-10':
+      //       self.frame = 'frame-9';
+      //       self.img = img[9];
+      //       break;
+      //   }
+      // }
     }
   }  
 }
@@ -134,50 +138,53 @@ Player.prototype.update = function(elapsedTime, input) {
  * @param {DOMHighResTimeStamp} elapsedTime
  * @param {CanvasRenderingContext2D} ctx
  */
-Player.prototype.render = function(elapasedTime, ctx, camera) {
+Player.prototype.render = function(elapasedTime, ctx, camera, gameOver) {
   //var offset = this.angle * 23;
-  ctx.save();
-  ctx.translate(this.position.x, this.position.y);
-  //ctx.drawImage(this.img, 48+offset, 57, 23, 27, -12.5, -12, 23, 27);
-  ctx.drawImage(this.img, 0, 0, this.width, this.height);
-  ctx.restore();
+  if(!gameOver)
+  {
+    ctx.save();
+    ctx.translate(this.position.x, this.position.y);
+    //ctx.drawImage(this.img, 48+offset, 57, 23, 27, -12.5, -12, 23, 27);
+    ctx.drawImage(this.img, 0, 0, this.width, this.height);
+    ctx.restore();
 
-  var img = new Image();
-  if(this.weapon === "weapon-1")
-  {
-    img.src = 'assets/weapons/Turret01.png';
-    ctx.save();
-    ctx.translate(this.position.x, this.position.y);
-    //ctx.drawImage(this.img, 48+offset, 57, 23, 27, -12.5, -12, 23, 27);
-    ctx.drawImage(img, 0 + 15, 0 + 30, 28 * 2 - 10, 28 * 2);
-    ctx.restore();
-  }
-  else if(this.weapon === "weapon-2")
-  {
-    img.src = 'assets/weapons/Turret04.png';
-    ctx.save();
-    ctx.translate(this.position.x, this.position.y);
-    //ctx.drawImage(this.img, 48+offset, 57, 23, 27, -12.5, -12, 23, 27);
-    ctx.drawImage(img, 0 + 15, 0 + 30, 28 * 2 - 10, 28 * 2);
-    ctx.restore();
-  }
-  else if(this.weapon === "weapon-3")
-  {
-    img.src = 'assets/weapons/Turret06.png';
-    ctx.save();
-    ctx.translate(this.position.x, this.position.y);
-    //ctx.drawImage(this.img, 48+offset, 57, 23, 27, -12.5, -12, 23, 27);
-    ctx.drawImage(img, 0 + 15, 0 + 30, 28 * 1.5, 28 * 1.5);
-    ctx.restore();
-  }
-  else if(this.weapon === "weapon-4")
-  {
-    img.src = 'assets/weapons/Turret02.png';
-    ctx.save();
-    ctx.translate(this.position.x, this.position.y);
-    //ctx.drawImage(this.img, 48+offset, 57, 23, 27, -12.5, -12, 23, 27);
-    ctx.drawImage(img, 0 + 15, 0 + 30, 28 * 2 - 10, 28 * 2);
-    ctx.restore();
+    var img = new Image();
+    if(this.weapon === "weapon-1")
+    {
+      img.src = 'assets/weapons/Turret01.png';
+      ctx.save();
+      ctx.translate(this.position.x, this.position.y);
+      //ctx.drawImage(this.img, 48+offset, 57, 23, 27, -12.5, -12, 23, 27);
+      ctx.drawImage(img, 0 + 15, 0 + 30, 28 * 2 - 10, 28 * 2);
+      ctx.restore();
+    }
+    else if(this.weapon === "weapon-2")
+    {
+      img.src = 'assets/weapons/Turret04.png';
+      ctx.save();
+      ctx.translate(this.position.x, this.position.y);
+      //ctx.drawImage(this.img, 48+offset, 57, 23, 27, -12.5, -12, 23, 27);
+      ctx.drawImage(img, 0 + 15, 0 + 30, 28 * 2 - 10, 28 * 2);
+      ctx.restore();
+    }
+    else if(this.weapon === "weapon-3")
+    {
+      img.src = 'assets/weapons/Turret06.png';
+      ctx.save();
+      ctx.translate(this.position.x, this.position.y);
+      //ctx.drawImage(this.img, 48+offset, 57, 23, 27, -12.5, -12, 23, 27);
+      ctx.drawImage(img, 0 + 15, 0 + 30, 28 * 1.5, 28 * 1.5);
+      ctx.restore();
+    }
+    else if(this.weapon === "weapon-4")
+    {
+      img.src = 'assets/weapons/Turret02.png';
+      ctx.save();
+      ctx.translate(this.position.x, this.position.y);
+      //ctx.drawImage(this.img, 48+offset, 57, 23, 27, -12.5, -12, 23, 27);
+      ctx.drawImage(img, 0 + 15, 0 + 30, 28 * 2 - 10, 28 * 2);
+      ctx.restore();
+    }
   }
 }
 

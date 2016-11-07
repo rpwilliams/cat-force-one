@@ -51,6 +51,7 @@ var shoot = false;
 var missileShoot = false;
 
 /* Other */
+var gameOverCheck = false;
 var explosions = [];
 var powerUps = [];
 var score = 0;
@@ -72,7 +73,6 @@ var backgrounds = [
 ];
 var level = 1;
 var enemiesKilled = 0;
-var gameOver = false;
 
 /* 
   This variable is used as a temporary fix enemies mysteriously getting 
@@ -136,6 +136,18 @@ window.onkeydown = function(event) {
         }
       }        
   }
+}
+
+window.onkeypress=function(event) {
+  if(gameOverCheck)
+  {
+    level = 1;
+    score = 0;
+    init();
+    document.getElementById('game-over').innerHTML = "";
+    document.getElementById('continue').innerHTML = "";
+    gameOverCheck = false;
+  }  
 }
 
 /**
@@ -292,6 +304,7 @@ function init()
     flappyGrumpyImg[7].src = 'assets/enemies/flappy-grumpy/frame-8.png';
 
     player = new Player(bullets, missiles, "weapon-1", playerImg);
+    camera = new Camera(canvas);
 
     for(var i = 0; i < 20; i++)
     {
@@ -376,7 +389,6 @@ function init()
   powerUps.push(new Powerup(3000,50));
   powerUps.push(new Powerup(4000,50));
 
-  
 }
 init();
 
@@ -386,8 +398,8 @@ init();
  * @param {DOMHighResTimeStamp} timestamp the current time
  */
 var masterLoop = function(timestamp) {
-  game.loop(timestamp);
-  window.requestAnimationFrame(masterLoop);
+    game.loop(timestamp);
+    window.requestAnimationFrame(masterLoop);
 }
 masterLoop(performance.now());
 
@@ -420,7 +432,8 @@ function update(elapsedTime) {
   }
   // Check if reached level 3
   else if(camera.position.x > 10000 && level == 2)
-  {
+  { 
+
     console.log("Level 2 reached");
     level = 3;
     init();
@@ -434,11 +447,8 @@ function update(elapsedTime) {
   // Check for game over
   if(player.lives < 1)
   {
-    console.log("GAME OVER!");
-    explosions.push(new Explosion(player.position.x + 3, player.position.y + 3));
-    player.position.x = -90000;
-    player.position.y = -90000;
-    gameOver = true;
+    gameOver(player);
+    player.lives = 5;
   }
 
   // Display the current level between 0 to 1000 in the x position
@@ -516,9 +526,9 @@ function update(elapsedTime) {
     {
       monster.collidedWithPlayer = true;
       player.lives--;
-      player.state = "hit";
+      // player.state = "hit";
       player.frame = "frame-10";
-      player.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
+      // player.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
     }
     // Check for bullet collisions
     for(var i = 0; i < bullets.pool.length; i+=4) {
@@ -567,9 +577,9 @@ function update(elapsedTime) {
       skull.collidedWithPlayer = true;
       skull.state = "hit";
       skull.img.src = 'assets/enemies/skull/hit/frame.png';
-      player.state = "hit";
+      // player.state = "hit";
       player.frame = "frame-10";
-      player.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
+      // player.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
       player.lives--;
     }
     // Check for bullet collisions
@@ -615,9 +625,9 @@ function update(elapsedTime) {
     if(checkCollision(player, dragon) && !dragon.collidedWithPlayer)
     {
       dragon.collidedWithPlayer = true;
-      player.state = "hit";
+      // player.state = "hit";
       player.frame = "frame-10";
-      player.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
+      // player.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
       player.lives--;
     }
     // Check for bullet collisons 
@@ -662,7 +672,7 @@ function update(elapsedTime) {
     if(checkCollision(player, grumpy) && !grumpy.collidedWithPlayer)
     {
       grumpy.collidedWithPlayer = true;
-      player.state = "hit";
+      // player.state = "hit";
       player.frame = "frame-10";
       player.lives--;
     }
@@ -710,9 +720,9 @@ function update(elapsedTime) {
     if(checkCollision(player, bird) && !bird.collidedWithPlayer)
     {
       bird.collidedWithPlayer = true;
-      player.state = "hit";
+      // player.state = "hit";
       player.frame = "frame-10";
-      player.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
+      // player.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
       bird.state = "hit";
       bird.frame = "frame-5";
       bird.img.src = 'assets/enemies/flappy-bird/hit/frame-2.png';
@@ -876,7 +886,7 @@ function renderWorld(elapsedTime, ctx, camera) {
   missiles.render(elapsedTime, ctx);
 
   // Render the player
-  player.render(elapsedTime, ctx, camera);
+  player.render(elapsedTime, ctx, camera, gameOverCheck);
 
   // Render the power up
   powerUps.forEach(function(powerup){
@@ -993,4 +1003,14 @@ function reinitializeEnemies()
   flappyDragons = [];
   flappyGrumpys = [];
   flappyBirds = [];
+}
+
+function gameOver(player, flag)
+{
+  console.log("GAME OVER!");
+  explosions.push(new Explosion(player.position.x + 3, player.position.y + 3));
+  document.getElementById('game-over').innerHTML = "GAME OVER";
+  document.getElementById('continue').innerHTML = "Press any key to continue";
+  gameOverCheck = true;
+  reinitializeEnemies();
 }

@@ -17,6 +17,15 @@ canvas#screen {
   bottom: 50%;
 }
 
+.game-over {
+  position: absolute;
+  margin: auto;
+  top: 50%;
+  right: 40%;
+  left: 40%;
+  bottom: 50%;
+}
+
 .middle-score {
   position: absolute;
   margin: auto;
