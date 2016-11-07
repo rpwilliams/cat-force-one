@@ -110,32 +110,61 @@ window.onkeydown = function(event) {
     //   break;
     /* Shoot a projectile if space is selected */
     case ' ':
-      if(player.weapon == "weapon-1" || player.weapon == "weapon-2")
+      if(player.weapon == "weapon-1")
       {
         if(!shoot)
         {
+          bullets.color = "white";
           shoot = true;
           console.log("Pew pew!");
-          var audio = new Audio('assets/sounds/player_shoot.wav'); // Created with http://www.bfxr.net/
+          var audio = new Audio('assets/sounds/weapon-1.wav'); // Created with http://www.bfxr.net/
           audio.play();
           player.fireBullet({x: 1, y: 0});
           initiatedBullet = true;
           break;
         }
       }
-      else if(player.weapon == "weapon-3" || player.weapon == "weapon-4") 
+      else if(player.weapon == "weapon-2")
+      {
+        if(!shoot)
+        {
+          bullets.color = "red"
+          shoot = true;
+          console.log("Pew pew!");
+          var audio = new Audio('assets/sounds/weapon-2.wav'); // Created with http://www.bfxr.net/
+          audio.play();
+          player.fireBullet({x: 1, y: 0});
+          initiatedBullet = true;
+          break;
+        }
+      }
+      else if(player.weapon == "weapon-3")
+      {
+        if(!shoot)
+        {
+          bullets.color = "yellow";
+          shoot = true;
+          console.log("Pew pew!");
+          var audio = new Audio('assets/sounds/weapon-3.wav'); // Created with http://www.bfxr.net/
+          audio.play();
+          player.fireBullet({x: 1, y: 0});
+          initiatedBullet = true;
+          break;
+        }
+      }
+      else if(player.weapon == "weapon-4") 
       {
         if(!missileShoot)
         {
           missileShoot = true;
           console.log("BOOM");
-          //var audio = new Audio('assets/sounds/player_shoot.wav'); // Created with http://www.bfxr.net/
-          //audio.play();
+          var audio = new Audio('assets/sounds/missile-sound.wav'); // Created with http://www.bfxr.net/
+          audio.play();
           player.fireMissile({x: 1, y: 0});
           initiatedMissile = true;
           break;
         }
-      }        
+      }     
   }
 }
 
@@ -433,7 +462,8 @@ function update(elapsedTime) {
   }
   // Check if reached level 3
   else if(camera.position.x > 10000 && level == 2)
-  {
+  { 
+
     console.log("Level 2 reached");
     level = 3;
     init();
@@ -529,13 +559,16 @@ function update(elapsedTime) {
       // player.state = "hit";
       player.frame = "frame-10";
       // player.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
+      var audio = new Audio('assets/sounds/player_hurt.wav'); // Created with http://www.bfxr.net/
+      audio.play();
     }
     // Check for bullet collisions
     for(var i = 0; i < bullets.pool.length; i+=4) {
-      if(enemyAndBulletCollision(monster, bullets, i, 2))
+      if(enemyAndBulletCollision(monster, bullets, i, 2) && initiatedBullet)
       {
         monster.collidedWithPlayer = true;
         monster.health--;
+        initiatedBullet = false;
         // Remove the bullets 
         bullets.update(elapsedTime, function(bullet){
           return true;
@@ -559,6 +592,8 @@ function update(elapsedTime) {
       enemiesKilled++;
       monster.active = false;
       explosions.push(new Explosion(monster.position.x + 2.5, monster.position.y));
+      var audio = new Audio('assets/sounds/explosion.wav'); // Created with http://www.bfxr.net/
+      audio.play();
     }
   });
 
@@ -581,12 +616,15 @@ function update(elapsedTime) {
       player.frame = "frame-10";
       // player.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
       player.lives--;
+      var audio = new Audio('assets/sounds/player_hurt.wav'); // Created with http://www.bfxr.net/
+      audio.play();
     }
     // Check for bullet collisions
     for(var i = 0; i < bullets.pool.length; i+=4) {
-      if(enemyAndBulletCollision(skull, bullets, i, 2))
+      if(enemyAndBulletCollision(skull, bullets, i, 2) && initiatedBullet)
       {
         skull.health--; 
+        initiatedBullet = false;
         // Remove the bullets 
         bullets.update(elapsedTime, function(bullet){
           return true;
@@ -611,6 +649,8 @@ function update(elapsedTime) {
       enemiesKilled++;
       skull.active = false;
       explosions.push(new Explosion(skull.position.x, skull.position.y));
+      var audio = new Audio('assets/sounds/explosion.wav'); // Created with http://www.bfxr.net/
+      audio.play();
     }
   });
 
@@ -629,13 +669,15 @@ function update(elapsedTime) {
       player.frame = "frame-10";
       // player.img.src = 'assets/enemies/flappy-cat/hit/frame-1.png';
       player.lives--;
+      var audio = new Audio('assets/sounds/player_hurt.wav'); // Created with http://www.bfxr.net/
+      audio.play();
     }
     // Check for bullet collisons 
     for(var i = 0; i < bullets.pool.length; i+=4) {
-      if(enemyAndBulletCollision(dragon, bullets, i, 2))
+      if(enemyAndBulletCollision(dragon, bullets, i, 2) && initiatedBullet)
       {
         dragon.health--;
-
+        initiatedBullet = false;
         bullets.update(elapsedTime, function(bullet){
         return true;
         });
@@ -659,6 +701,8 @@ function update(elapsedTime) {
       enemiesKilled++;
       dragon.active = false;
       explosions.push(new Explosion(dragon.position.x - 5, dragon.position.y));
+      var audio = new Audio('assets/sounds/explosion.wav'); // Created with http://www.bfxr.net/
+      audio.play();
     }
   });
 
@@ -675,6 +719,8 @@ function update(elapsedTime) {
       // player.state = "hit";
       player.frame = "frame-10";
       player.lives--;
+      var audio = new Audio('assets/sounds/player_hurt.wav'); // Created with http://www.bfxr.net/
+      audio.play();
     }
     for(var i = 0; i < bullets.pool.length; i+=4) {
       if(enemyAndBulletCollision(grumpy, bullets, i, 2) && initiatedBullet)
@@ -705,6 +751,8 @@ function update(elapsedTime) {
       enemiesKilled++;
       grumpy.active = false;
       explosions.push(new Explosion(grumpy.position.x - 2, grumpy.position.y));
+      var audio = new Audio('assets/sounds/explosion.wav'); // Created with http://www.bfxr.net/
+      audio.play();
     }
   });
 
@@ -727,12 +775,14 @@ function update(elapsedTime) {
       bird.frame = "frame-5";
       bird.img.src = 'assets/enemies/flappy-bird/hit/frame-2.png';
       player.lives--;
-      explosions.push(new Explosion(player.position.x, player.position.y));
+      var audio = new Audio('assets/sounds/player_hurt.wav'); // Created with http://www.bfxr.net/
+      audio.play();
     }
     // Check for bullet collisions
     for(var i = 0; i < bullets.pool.length; i+=4) {
-      if(enemyAndBulletCollision(bird, bullets, i, 2))
+      if(enemyAndBulletCollision(bird, bullets, i, 2) && initiatedBullet)
       {
+        initiatedBullet = false;
         bird.health--;
         bullets.update(elapsedTime, function(bullet){
           return true;
@@ -757,6 +807,8 @@ function update(elapsedTime) {
       enemiesKilled++;
       bird.active = false;
       explosions.push(new Explosion(bird.position.x, bird.position.y));
+      var audio = new Audio('assets/sounds/explosion.wav'); // Created with http://www.bfxr.net/
+      audio.play();
     }
   });
 
@@ -1009,6 +1061,8 @@ function gameOver(player, flag)
 {
   console.log("GAME OVER!");
   explosions.push(new Explosion(player.position.x + 3, player.position.y + 3));
+  var audio = new Audio('assets/sounds/explosion.wav'); // Created with http://www.bfxr.net/
+  audio.play();
   document.getElementById('game-over').innerHTML = "GAME OVER";
   document.getElementById('continue').innerHTML = "Press any key to continue";
   gameOverCheck = true;
