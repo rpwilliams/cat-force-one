@@ -4,7 +4,7 @@
 const Vector = require('./vector');
 
 /* Constants */
-const PLAYER_SPEED = 3;
+const PLAYER_SPEED = 3.5;
 const BULLET_SPEED = 10;
 const MISSILE_SPEED = 10;
 const MS_PER_FRAME = 1000/8;

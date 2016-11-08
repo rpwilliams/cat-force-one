@@ -32,9 +32,9 @@ var missiles = new MissilePool(10);
 var player;
 
 /* Music */
-var level1Music;
-var level2Music;
-var level3Music;
+var level1Music = new Audio('assets/music/level-1-music.wav');
+var level2Music = new Audio('assets/music/level-2-music.mp3');  
+var level3Music = new Audio('assets/music/level-3-music.wav');;
 
 /* Enemies */
 var flappyMonsters = [];
@@ -215,7 +215,8 @@ function init()
     */
 
     // http://www.dl-sounds.com/royalty-free/star-commander1/
-    level1Music = new Audio('assets/music/level-1-music.wav');
+    level1Music.pause();
+    level2Music.pause();
     level1Music.play();
   
     // Load the background images
@@ -351,13 +352,13 @@ function init()
 
     // http://www.dl-sounds.com/royalty-free/fantasy-island/
     level1Music.pause();
-    level2Music = new Audio('assets/music/level-2-music.mp3');  
+    level3Music.pause();
     level2Music.play();
 
     // Randomly generate flappy monsters
     for(var i = 0; i < 30; i++)
     {
-      var randomMonsterX = Math.floor(Math.random() * 5000) + 0;
+      var randomMonsterX = Math.floor(Math.random() * 10000) + 0;
       var randomMonsterY = Math.floor(Math.random() * 700) + 1;
       flappyMonsters.push(new FlappyMonster(randomMonsterX, randomMonsterY, flappyMonsterImg));
     }
@@ -378,35 +379,46 @@ function init()
     bullets.color = "black";
 
     // http://www.dl-sounds.com/royalty-free/discotek-loop/
+    level1Music.pause();
     level2Music.pause();
-    level3Music = new Audio('assets/music/level-3-music.wav');
+    if (typeof level3Music.loop == 'boolean')
+    {
+        level3Music.loop = true;
+    }
+    else
+    {
+        level3Music.addEventListener('ended', function() {
+            this.currentTime = 0;
+            this.play();
+        }, false);
+    }
     level3Music.play();
   
     // Randomly generate flappy monsters
-    for(var i = 0; i < 30; i++)
+    for(var i = 0; i < 15; i++)
     {
-      var randomMonsterX = Math.floor(Math.random() * 5000) + 100;
+      var randomMonsterX = Math.floor(Math.random() * 2500) + 100;
       var randomMonsterY = Math.floor(Math.random() * 700) + 1;
       flappyMonsters.push(new FlappyMonster(randomMonsterX, randomMonsterY, flappyMonsterImg));
     }
     // Randomly generate flappy dragons
-    for(var i = 0; i < 30; i++)
+    for(var i = 0; i < 15; i++)
     {
-      var randomDragonX = Math.floor(Math.random() * 27000) + 5000;
+      var randomDragonX = Math.floor(Math.random() * 10000) + 5000;
       var randomDragonY = Math.floor(Math.random() * 700) + 1;
       flappyDragons.push(new FlappyDragon(randomDragonX, randomDragonY, flappyDragonImg));
     }
     // Randomly generate skulls
-    for(var i = 0; i < 20; i++)
+    for(var i = 0; i < 10; i++)
     {
-      var randomSkullX = Math.floor(Math.random() * 10000) + 200;
+      var randomSkullX = Math.floor(Math.random() * 5000) + 200;
       var randomSkullY = Math.floor(Math.random() * 1000) + 1;
       skulls.push(new Skull(randomSkullX, randomSkullY, canvas, skullImg));
     }
     // Randomly generate flappy grumpys
-    for(var i = 0; i < 20; i++)
+    for(var i = 0; i < 10; i++)
     {
-      var randomGrumpyX = Math.floor(Math.random() * 20000) + 200;
+      var randomGrumpyX = Math.floor(Math.random() * 10000) + 200;
       var randomGrumpyY = Math.floor(Math.random() * 700) + 1;
       flappyGrumpys.push(new FlappyGrumpy(randomGrumpyX, randomGrumpyY, flappyGrumpyImg));
     }
@@ -428,6 +440,39 @@ function init()
   powerUps.push(new Powerup(9000,50));  
 }
 init(); // Create level 1
+
+function initLevel3SecondHalf()
+{
+  // Randomly generate flappy monsters
+    for(var i = 0; i < 15; i++)
+    {
+      var randomMonsterX = Math.floor(Math.random() * 10000) + 3000;
+      var randomMonsterY = Math.floor(Math.random() * 700) + 1;
+      flappyMonsters.push(new FlappyMonster(randomMonsterX, randomMonsterY, flappyMonsterImg));
+    }
+    // Randomly generate flappy dragons
+    for(var i = 0; i < 15; i++)
+    {
+      var randomDragonX = Math.floor(Math.random() * 20000) + 10000;
+      var randomDragonY = Math.floor(Math.random() * 700) + 1;
+      flappyDragons.push(new FlappyDragon(randomDragonX, randomDragonY, flappyDragonImg));
+    }
+    // Randomly generate skulls
+    for(var i = 0; i < 15; i++)
+    {
+      var randomSkullX = Math.floor(Math.random() * 10000) + 5000;
+      var randomSkullY = Math.floor(Math.random() * 1000) + 1;
+      skulls.push(new Skull(randomSkullX, randomSkullY, canvas, skullImg));
+    }
+    // Randomly generate flappy grumpys
+    for(var i = 0; i < 15; i++)
+    {
+      var randomGrumpyX = Math.floor(Math.random() * 15000) + 10000;
+      var randomGrumpyY = Math.floor(Math.random() * 700) + 1;
+      flappyGrumpys.push(new FlappyGrumpy(randomGrumpyX, randomGrumpyY, flappyGrumpyImg));
+    }
+}
+
 
 /**
  * @function masterLoop
@@ -482,6 +527,11 @@ function update(elapsedTime) {
     console.log("YOU WIN!");
   }
   updateWin();  // Check if game win
+
+  if(camera.position.x == 5000 && level == 3)
+  {
+    initLevel3SecondHalf();
+  }
 
   // Check for game over
   if(player.lives < 1)
@@ -557,42 +607,47 @@ function update(elapsedTime) {
 
   flappyMonsters.forEach(function(monster){
     monster.update(elapsedTime);
-    // Check for player collisions
-    if(checkCollision(player, monster) && !monster.collidedWithPlayer)
+    // Only check for collisions if the monster is on the screen
+    if(Math.abs(player.position.x - monster.position.x) < 500)
     {
-      monster.collidedWithPlayer = true;
-      player.lives--;
-      player.frame = "frame-10";
-      var audio = new Audio('assets/sounds/player_hurt.wav'); // Created with http://www.bfxr.net/
-      audio.play();
-    }
-    // Check for bullet collisions
-    for(var i = 0; i < bullets.pool.length; i+=4) {
-      if(enemyAndBulletCollision(monster, bullets, i, 2) && initiatedBullet)
+      // Check for player collisions
+      if(checkCollision(player, monster) && !monster.collidedWithPlayer)
       {
         monster.collidedWithPlayer = true;
-        monster.health--;
-        initiatedBullet = false;
-        var audio = new Audio('assets/sounds/enemy_hurt.wav'); // Created with http://www.bfxr.net/
+        player.lives--;
+        player.frame = "frame-10";
+        var audio = new Audio('assets/sounds/player_hurt.wav'); // Created with http://www.bfxr.net/
         audio.play();
-        // Remove the bullets 
-        bullets.update(elapsedTime, function(bullet){
-          return true;
-        });
+      }
+      // Check for bullet collisions
+      for(var i = 0; i < bullets.pool.length; i+=4) {
+        if(enemyAndBulletCollision(monster, bullets, i, 2) && initiatedBullet)
+        {
+          monster.collidedWithPlayer = true;
+          monster.health--;
+          initiatedBullet = false;
+          var audio = new Audio('assets/sounds/enemy_hurt.wav'); // Created with http://www.bfxr.net/
+          audio.play();
+          // Remove the bullets 
+          bullets.update(elapsedTime, function(bullet){
+            return true;
+          });
+        }
+      }
+      // Check for missile collisions
+      for(var j = 0; j < missiles.pool.length; j+=4) {
+        if(enemyAndMissileCollision(monster, missiles, j, 64, 64) && initiatedMissile)
+        {
+          monster.health -= 2;
+          initiatedMissile = false;
+          // Remove the bullets 
+          missiles.update(elapsedTime, function(missile){
+            return true;
+          });
+        }
       }
     }
-    // Check for missile collisions
-    for(var j = 0; j < missiles.pool.length; j+=4) {
-      if(enemyAndMissileCollision(monster, missiles, j, 64, 64) && initiatedMissile)
-      {
-        monster.health -= 2;
-        initiatedMissile = false;
-        // Remove the bullets 
-        missiles.update(elapsedTime, function(missile){
-          return true;
-        });
-      }
-    }
+    
     if(monster.health < 1)
     {
       enemiesKilled++;
@@ -610,42 +665,46 @@ function update(elapsedTime) {
   // Update the flappy skulls
   skulls.forEach(function(skull){
     skull.update(elapsedTime);
-    // Check for player collisions
-    if(checkCollision(player, skull) && !skull.collidedWithPlayer)
+    // Only check for collisions if the monster is on the screen
+    if(Math.abs(player.position.x - skull.position.x) < 750)
     {
-      skull.collidedWithPlayer = true;
-      skull.state = "hit";
-      skull.img.src = 'assets/enemies/skull/hit/frame.png';
-      player.frame = "frame-10";
-      player.lives--;
-      var audio = new Audio('assets/sounds/player_hurt.wav'); // Created with http://www.bfxr.net/
-      audio.play();
-    }
-    // Check for bullet collisions
-    for(var i = 0; i < bullets.pool.length; i+=4) {
-      if(enemyAndBulletCollision(skull, bullets, i, 2) && initiatedBullet)
+       // Check for player collisions
+      if(checkCollision(player, skull) && !skull.collidedWithPlayer)
       {
-        skull.health--; 
-        initiatedBullet = false;
-        // Remove the bullets 
-        bullets.update(elapsedTime, function(bullet){
-          return true;
-        });
+        skull.collidedWithPlayer = true;
+        skull.state = "hit";
+        skull.img.src = 'assets/enemies/skull/hit/frame.png';
+        player.frame = "frame-10";
+        player.lives--;
+        var audio = new Audio('assets/sounds/player_hurt.wav'); // Created with http://www.bfxr.net/
+        audio.play();
       }
-    }
-    // Check for missile collisions
-    for(var j = 0; j < missiles.pool.length; j+=4) {
-      if(enemyAndMissileCollision(skull, missiles, j, 64, 64) && initiatedMissile)
-      {
-        skull.health -= 2;
-        console.log("Missile collision!");
-        initiatedMissile = false;
-        // Remove the bullets 
-        missiles.update(elapsedTime, function(missile){
-          return true;
-        });
+      // Check for bullet collisions
+      for(var i = 0; i < bullets.pool.length; i+=4) {
+        if(enemyAndBulletCollision(skull, bullets, i, 2) && initiatedBullet)
+        {
+          skull.health--; 
+          initiatedBullet = false;
+          // Remove the bullets 
+          bullets.update(elapsedTime, function(bullet){
+            return true;
+          });
+        }
       }
-    }
+      // Check for missile collisions
+      for(var j = 0; j < missiles.pool.length; j+=4) {
+        if(enemyAndMissileCollision(skull, missiles, j, 64, 64) && initiatedMissile)
+        {
+          skull.health -= 2;
+          console.log("Missile collision!");
+          initiatedMissile = false;
+          // Remove the bullets 
+          missiles.update(elapsedTime, function(missile){
+            return true;
+          });
+        }
+      }
+    } 
     if(skull.health < 1)
     {
       enemiesKilled++;
@@ -663,45 +722,49 @@ function update(elapsedTime) {
   // Update the flappy dragons
   flappyDragons.forEach(function(dragon){
     dragon.update(elapsedTime);
-    if(checkCollision(player, dragon) && !dragon.collidedWithPlayer)
+    // Only check for collisions if the monster is on the screen
+    if(Math.abs(player.position.x - dragon.position.x) < 750)
     {
-      dragon.collidedWithPlayer = true;
-      player.frame = "frame-10";
-      player.lives--;
-      var audio = new Audio('assets/sounds/player_hurt.wav'); // Created with http://www.bfxr.net/
-      audio.play();
-    }
-    // Check for bullet collisons 
-    for(var i = 0; i < bullets.pool.length; i+=4) {
-      if(enemyAndBulletCollision(dragon, bullets, i, 2) && initiatedBullet)
+      if(checkCollision(player, dragon) && !dragon.collidedWithPlayer)
       {
-        dragon.health--;
-        initiatedBullet = false;
-        bullets.update(elapsedTime, function(bullet){
-        return true;
-        });
+        dragon.collidedWithPlayer = true;
+        player.frame = "frame-10";
+        player.lives--;
+        var audio = new Audio('assets/sounds/player_hurt.wav'); // Created with http://www.bfxr.net/
+        audio.play();
       }
-    }
-    // Check for missile collisions
-    for(var j = 0; j < missiles.pool.length; j+=4) {
-      if(enemyAndMissileCollision(dragon, missiles, j, 64, 64)  && initiatedMissile)
-      {
-        dragon.health -= 2;
-        initiatedMissile = false;
-        console.log("Missile collision!");
-        // Remove the bullets (TO DO: fix this so it only removes one)
-        missiles.update(elapsedTime, function(missile){
+      // Check for bullet collisons 
+      for(var i = 0; i < bullets.pool.length; i+=4) {
+        if(enemyAndBulletCollision(dragon, bullets, i, 2) && initiatedBullet)
+        {
+          dragon.health--;
+          initiatedBullet = false;
+          bullets.update(elapsedTime, function(bullet){
           return true;
-        });
+          });
+        }
       }
-    }
-    if(dragon.health < 1)
-    {
-      enemiesKilled++;
-      dragon.active = false;
-      explosions.push(new Explosion(dragon.position.x - 5, dragon.position.y));
-      var audio = new Audio('assets/sounds/explosion.wav'); // Created with http://www.bfxr.net/
-      audio.play();
+      // Check for missile collisions
+      for(var j = 0; j < missiles.pool.length; j+=4) {
+        if(enemyAndMissileCollision(dragon, missiles, j, 64, 64)  && initiatedMissile)
+        {
+          dragon.health -= 2;
+          initiatedMissile = false;
+          console.log("Missile collision!");
+          // Remove the bullets (TO DO: fix this so it only removes one)
+          missiles.update(elapsedTime, function(missile){
+            return true;
+          });
+        }
+      }
+      if(dragon.health < 1)
+      {
+        enemiesKilled++;
+        dragon.active = false;
+        explosions.push(new Explosion(dragon.position.x - 5, dragon.position.y));
+        var audio = new Audio('assets/sounds/explosion.wav'); // Created with http://www.bfxr.net/
+        audio.play();
+      }
     }
   });
 
@@ -712,39 +775,43 @@ function update(elapsedTime) {
   // Update the flappy grumpys
   flappyGrumpys.forEach(function(grumpy){
     grumpy.update(elapsedTime);
-    if(checkCollision(player, grumpy) && !grumpy.collidedWithPlayer)
+    // Only check for collisions if the monster is on the screen
+    if(Math.abs(player.position.x - grumpy.position.x) < 750)
     {
-      grumpy.collidedWithPlayer = true;
-      player.frame = "frame-10";
-      player.lives--;
-      var audio = new Audio('assets/sounds/player_hurt.wav'); // Created with http://www.bfxr.net/
-      audio.play();
-    }
-    for(var i = 0; i < bullets.pool.length; i+=4) {
-      if(enemyAndBulletCollision(grumpy, bullets, i, 2) && initiatedBullet)
+      if(checkCollision(player, grumpy) && !grumpy.collidedWithPlayer)
       {
+        grumpy.collidedWithPlayer = true;
+        player.frame = "frame-10";
+        player.lives--;
         var audio = new Audio('assets/sounds/player_hurt.wav'); // Created with http://www.bfxr.net/
         audio.play();
-        grumpy.health--;
-        initiatedBullet = false;
-        bullets.update(elapsedTime, function(bullet){
-          return true;
-        });
       }
-    }
-    // Check for missile collisions
-    for(var j = 0; j < missiles.pool.length; j+=4) {
-      if(enemyAndMissileCollision(grumpy, missiles, j, 64, 64) && initiatedMissile)
-      {
-        grumpy.health -= 2; 
-        initiatedMissile = false;
-        console.log("Missile collision!");
-        // Remove the bullets 
-        missiles.update(elapsedTime, function(missile){
-          return true;
-        });
+      for(var i = 0; i < bullets.pool.length; i+=4) {
+        if(enemyAndBulletCollision(grumpy, bullets, i, 2) && initiatedBullet)
+        {
+          var audio = new Audio('assets/sounds/player_hurt.wav'); // Created with http://www.bfxr.net/
+          audio.play();
+          grumpy.health--;
+          initiatedBullet = false;
+          bullets.update(elapsedTime, function(bullet){
+            return true;
+          });
+        }
       }
-    }
+      // Check for missile collisions
+      for(var j = 0; j < missiles.pool.length; j+=4) {
+        if(enemyAndMissileCollision(grumpy, missiles, j, 64, 64) && initiatedMissile)
+        {
+          grumpy.health -= 2; 
+          initiatedMissile = false;
+          console.log("Missile collision!");
+          // Remove the bullets 
+          missiles.update(elapsedTime, function(missile){
+            return true;
+          });
+        }
+      }
+    }  
     if(grumpy.health < 1)
     {
       enemiesKilled++;
@@ -762,43 +829,47 @@ function update(elapsedTime) {
   // Update the flappy birds
   flappyBirds.forEach(function(bird){
     bird.update(elapsedTime);
-    if(checkCollision(player, bird) && !bird.collidedWithPlayer)
+    if(Math.abs(player.position.x - bird.position.x) < 750)
     {
-      var audio = new Audio('assets/sounds/player_hurt.wav'); // Created with http://www.bfxr.net/
-      audio.play();
-      bird.collidedWithPlayer = true;
-      player.frame = "frame-10";
-      bird.state = "hit";
-      bird.frame = "frame-5";
-      bird.img.src = 'assets/enemies/flappy-bird/hit/frame-2.png';
-      player.lives--;
-      var audio = new Audio('assets/sounds/player_hurt.wav'); // Created with http://www.bfxr.net/
-      audio.play();
-    }
-    // Check for bullet collisions
-    for(var i = 0; i < bullets.pool.length; i+=4) {
-      if(enemyAndBulletCollision(bird, bullets, i, 2) && initiatedBullet)
+      if(checkCollision(player, bird) && !bird.collidedWithPlayer)
       {
-        initiatedBullet = false;
-        bird.health--;
-        bullets.update(elapsedTime, function(bullet){
-          return true;
-        });
+        var audio = new Audio('assets/sounds/player_hurt.wav'); // Created with http://www.bfxr.net/
+        audio.play();
+        bird.collidedWithPlayer = true;
+        player.frame = "frame-10";
+        bird.state = "hit";
+        bird.frame = "frame-5";
+        bird.img.src = 'assets/enemies/flappy-bird/hit/frame-2.png';
+        player.lives--;
+        var audio = new Audio('assets/sounds/player_hurt.wav'); // Created with http://www.bfxr.net/
+        audio.play();
+      }
+      // Check for bullet collisions
+      for(var i = 0; i < bullets.pool.length; i+=4) {
+        if(enemyAndBulletCollision(bird, bullets, i, 2) && initiatedBullet)
+        {
+          initiatedBullet = false;
+          bird.health--;
+          bullets.update(elapsedTime, function(bullet){
+            return true;
+          });
+        }
+      }
+      // Check for missile collisions
+      for(var j = 0; j < missiles.pool.length; j+=4) {
+        if(enemyAndMissileCollision(bird, missiles, j, 64, 64) && initiatedMissile)
+        {
+          bird.health -= 2;
+          console.log("Missile collision!");
+          initiatedMissile = false;
+          // Remove the bullets 
+          missiles.update(elapsedTime, function(missile){
+            return true;
+          });
+        }
       }
     }
-    // Check for missile collisions
-    for(var j = 0; j < missiles.pool.length; j+=4) {
-      if(enemyAndMissileCollision(bird, missiles, j, 64, 64) && initiatedMissile)
-      {
-        bird.health -= 2;
-        console.log("Missile collision!");
-        initiatedMissile = false;
-        // Remove the bullets 
-        missiles.update(elapsedTime, function(missile){
-          return true;
-        });
-      }
-    }
+    
     if(bird.health < 1)
     {
       enemiesKilled++;
