@@ -1,23 +1,7 @@
-s# Shooter
-An assignment template for a scrolling shooter, a clone of [Tyrian](https://en.wikipedia.org/wiki/Tyrian_(video_game)) created for the Fall 2016 class of CIS 580 at Kansas State University.
-
-## Requirements
-
-The game is implemented in JavaScript using the HTML5 canvas element and the provided game framework.
-
-1. DONE: The player pilots a ship that can maneuver around the screen and fire weapons.  The player has a set amount of life that is reduced by being hit by enemy weapons and enemies.  When the player dies, they explode using a particle system (20 points).
-
-2. DONE: The player flies through a parallax scrolling world composed of at least three layers generated using tilemaps (20 points).
-
-3. DONE: The player ship can be upgraded with better weapons providing different advantages and visual representations on-screen.  These upgrades are provided via powerups that can be picked up in game.  At least three of these implement particle effects (20 points).
-
-4. DONE: At least five unique types of enemies using different attack strategies and behaviors actively oppose the player's progress.  Colliding with an enemy or enemy projectile cause damage to the player.  Destroying an enemy causes an explosion or similar destruction implementing a particle engine (20 points).
-
-5. DONE: The player progresses through at least three levels (either by reaching the end of the level or defeating a boss), and between levels a screen summarizing they player's performance is displayed (20 points).
-
-### Extra Credit
-
-1. An additional 20 points is available for especially impressive games.
+# Cat Force One
+A side scroller adventure featuring a cat with a machine gun.
+A live version of the game can be found here: http://www.ryanpaulwilliams.com/cat-force-one
+Warning: the current state of the game is very laggy.
 
 ## Bundling
 The source code in the src directory is bundled into a single file using **Browserify**.  The Browserify tools must first be installed on your system:
@@ -42,7 +26,3 @@ Then run the command:
 
 The bundle will automatically be re-created every time you change a source file.  However, you still need to refresh your browser for the changed bundle to take effect.
 
-## Credits
-Game framework HTML5/CSS3/Javascript code was written by course instructor Nathan Bean, and released under the [CC-A-SA 3.0 License](https://creativecommons.org/licenses/by-sa/3.0/)
-
-Assets are remastered graphics from the game Tyrian released as public domain on [Lostgarden](http://www.lostgarden.com/2007/04/free-game-graphics-tyrian-ships-and.html)
